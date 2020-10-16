@@ -1,0 +1,16 @@
+/*
+*
+*	Android DMX App - An Android based Light Controller
+*		Created by: Andrew O'Shei
+*		Project Start Date: Oct. 16, 2020
+*
+*/
+
+
+TODO List:
+
+1. ~~Design Circuit for ESP32-based Wifi to DMX Device~~
+2. Build ESP32 Based Wifi to DMX device
+3. Program ESP32 Based Wifi to DMX device
+4. Design GUI for App
+5. Build backend for connecting and messaging wifi device
