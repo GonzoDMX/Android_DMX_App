@@ -1,3 +1,11 @@
+/*
+ *  Created by: Andrew O'Shei
+ *  Date: October 29, 2020
+ *  Description: Code for ESP32, sets ESP32 in Access Point Mode
+ *  User can connect and control DMX output via UDP message strings
+ * 
+ */
+
 #include <WiFi.h>
 #include <WiFiUdp.h>
 #include <LXESP32DMX.h>
