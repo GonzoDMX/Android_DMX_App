@@ -50,6 +50,10 @@ void copyDMXToOutput(void) {
 
 bool standbyMode = false;
 
+IPAddress currentIP;
+
+bool initConnect = true;
+
 
 void setup() {
   Serial.begin(115200);
@@ -78,6 +82,75 @@ void setup() {
 }
 
 
+
+void returnMsg(int index) {
+  Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
+  switch (index) {
+    case 1:
+    {
+      char msg[] = {'<', '/', 'I', 'N', 'I', 'T', 'I', 'A', 'L', '>'};
+      for (int i = 0; i < 10; i++){
+        Udp.write(msg[i]);
+      }
+      break;
+    }
+    case 2:
+    {
+      char msg[] = {'<', '/', 'S', 'T', 'A', 'N', 'D', 'B', 'Y', '>'};
+      for (int i = 0; i < 10; i++){
+        Udp.write(msg[i]);
+      }
+      break;
+    }
+    case 3:
+    {
+      char msg[] = {'<', '/', 'O', 'V', 'E', 'R', 'I', 'D', 'E', '>'};
+      for (int i = 0; i < 10; i++){
+        Udp.write(msg[i]);
+      }
+      break;
+    }
+    case 4:
+    {
+      char msg[] = {'<', '/', 'B', 'R', 'A', 'K', 'M', 'O', 'D', '>'};
+      for (int i = 0; i < 10; i++){
+        Udp.write(msg[i]);
+      }
+      break;
+    }
+    case 5:
+    {
+      char msg[] = {'<', '/', 'D', 'E', 'J', 'A', '_', 'V', 'U', '>'};
+      for (int i = 0; i < 10; i++){
+        Udp.write(msg[i]);
+      }
+      break;
+    }
+    case 6:
+    {
+      char msg[] = {'<', '/', 'I', 'N', 'V', 'A', 'L', 'I', 'D', '>'};
+      for (int i = 0; i < 10; i++){
+        Udp.write(msg[i]);
+      }
+      break;
+    }
+    case 7:
+    {
+      char msg[] = {'<', '/', 'N', 'O', 'N', 'C', 'O', 'N', 'N', '>'};
+      for (int i = 0; i < 10; i++){
+        Udp.write(msg[i]);
+      }
+      break;
+    }
+    default:
+    {
+      break;
+    }
+  }
+  Udp.endPacket(); 
+}
+  
+
 void loop() {
  
   int packetSize = Udp.parsePacket();
@@ -85,149 +158,255 @@ void loop() {
     // receive incoming UDP packets
     Serial.printf("Received %d bytes from %s, port %d\n", packetSize, Udp.remoteIP().toString().c_str(), Udp.remotePort());
     int len = Udp.read(incomingPacket, 548);
+    //Check incoming packet size
     if (len > 9) {
       int index = 0;
       for (index; index < 9; index++){
         head[index] = incomingPacket[index];
         }
-
       
       /*-------PARSE INCOMING CHANNEL DATA-------*/
       /*-----------------------------------------*/
-      if (strcmp(head, "<CHANNEL>") == 0 && standbyMode == false) {
-        digitalWrite(LED_BLUE, LOW);
-        Serial.print("Set Channels");
-        int chan = 0;
-        for (index; index < 12; index++){
-          chanCount[chan] = incomingPacket[index];
-          chan++;
-        }
-        chan = 1;
-        int channels = atoi(chanCount);
-        Serial.printf("Number of Channels: %d\n", channels);
-        for (index; index < channels + 12; index++) {
-          dmxbuffer[chan] = incomingPacket[index];
-          chan++;
-          if (chan == 513 || chan > channels){
-            break;
+      if (strcmp(head, "<CHANNEL>") == 0) {
+        if (initConnect == false) {
+          if (standbyMode == false) {
+            //Check remote credentials
+            if (Udp.remoteIP() == currentIP){
+              Serial.print("Set Channels");
+              char msg[] = {'<', '/', ' ', ' ', ' ', '>'};
+              int chan = 0;
+              //Get number of channels/byte string length
+              for (index; index < 12; index++){
+                chanCount[chan] = incomingPacket[index];
+                msg[chan + 2] = incomingPacket[index];
+                chan++;
+              }
+              chan = 1;
+              //Set new channel values to DMX buffer and output
+              int channels = atoi(chanCount);
+              for (index; index < channels + 12; index++) {
+                dmxbuffer[chan] = incomingPacket[index];
+                chan++;
+                if (chan == 513 || chan > channels){
+                  break;
+                }
+              }
+              copyDMXToOutput();
+              //Send reply message </'# of Channels Set'>
+              Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
+              for (int i = 0; i < 6; i++){
+                Udp.write(msg[i]);
+              }
+              Udp.endPacket();
+            }
+          else{
+            //Send override message, remote is not the master
+            returnMsg(3);
+            }
+          }
+          else{
+            //Send standby message, device is in standby
+            returnMsg(2);
+            }
+          }
+          else {
+            //Send No Connection message, remote is not connected
+            returnMsg(7);
           }
         }
-        copyDMXToOutput();
-        char msg[] = {'<', '/', '>'};
-        Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-        for (int i = 0; i < 3; i++){
-          Udp.write(msg[i]);
-        }
-        Udp.endPacket();
-      }
 
-
-      /*-------Signal that device is in STANDBY Mode-------*/
-      /*---------------------------------------------------*/
-      else if (strcmp(head, "<CHANNEL>") == 0 && standbyMode == true) {
-        char msg[] = {'<', '/', 'R', 'E', 'S', 'U', 'M', 'E', '?', '>'};
-        Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-        for (int i = 0; i < 10; i++){
-          Udp.write(msg[i]);
-        }
-        Udp.endPacket();
-      }
 
       /*--------------NEW DEVICE IS CONNECTING-------------*/
       /*-----(If device in standby mode ask to resume)-----*/
-      else if (strcmp(head, "<CONNECT>")) {
-        digitalWrite(LED_BLUE, LOW);
+      else if (strcmp(head, "<CONNECT>") == 0) {
         Serial.print("Connect");
-        if(standbyMode == true){
-          char msg[] = {'<', '/', 'R', 'E', 'S', 'U', 'M', 'E', '?', '>'};
-          Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-          for (int i = 0; i < 10; i++){
-            Udp.write(msg[i]);
+        //Check remote credentials
+        if (currentIP != Udp.remoteIP()){
+          //If first connection in this session
+          if (initConnect == true) {
+            //Set remote credentials
+            currentIP = Udp.remoteIP();
+            //Reply with Initial message, device connection initialized
+            returnMsg(1);
+            //Signal Active mode engaged
+            digitalWrite(LED_RED, HIGH);
+            initConnect = false;
+            }
+          else{
+            //Send override message, remote is not the master
+            returnMsg(3);
           }
-          Udp.endPacket();
         }
         else {
-          char msg[] = {'<', '/', 'I', 'N', 'I', 'T', 'I', 'A', 'L', '>'};
-          Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-          for (int i = 0; i < 10; i++){
-            Udp.write(msg[i]);
+          if(standbyMode == true){
+            //Send Standby message, device is in standby mode
+            returnMsg(2);
           }
-          Udp.endPacket();
-          digitalWrite(LED_RED, HIGH);
-        }
+          else{
+            //Send deja vu message, remote is already connected
+            returnMsg(5);
+            }
+          }
       }
 
+
+      /*-------Device Override------------------*/
+      /*----------------------------------------*/
+      else if (strcmp(head, "<OVERIDE>") == 0) {
+        Serial.print("Override");
+        if (initConnect == false) {
+          //Check remote credentials
+          if (currentIP != Udp.remoteIP()){
+            //Set new remote credentials
+            currentIP = Udp.remoteIP();
+            //Send Initial message, new connection has been initialized
+            returnMsg(1);
+            //Set all DMX channels to Zero
+            for (int i = 0; i < 512; i++){
+              dmxbuffer[i + 1] = 0;
+            }
+            copyDMXToOutput();
+            //If in standby mode set to active
+            standbyMode = false;
+            //Signal valid connection
+            digitalWrite(LED_RED, HIGH);
+            }
+          else{
+            //Send deja vu message, remote is already connected
+            returnMsg(5);
+          }
+        }
+        else {
+          //Send No Connection message, remote is not connected
+          returnMsg(7);
+        }
+      }
+      
 
       /*-------SET DEVICE TO STANDBY MODE-------*/
       /*----------------------------------------*/
       else if (strcmp(head, "<STANDBY>") == 0) {
-        digitalWrite(LED_BLUE, LOW);
         Serial.print("Standby");
-        char msg[] = {'<', '/', 'S', 'T', 'A', 'N', 'D', 'B', 'Y', '>'};
-        Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-        for (int i = 0; i < 10; i++){
-          Udp.write(msg[i]);
+        if (initConnect == false) {
+          //Check remote Credentials
+          if (Udp.remoteIP() == currentIP){
+            //Send Standby message, device is in standby mode
+            returnMsg(2);
+            //Set device to active mode
+            standbyMode = true;
+            digitalWrite(LED_RED, LOW);
+            }
+          else{
+            //Send override message, remote is not the master
+            returnMsg(3);
+          }
         }
-        Udp.endPacket();
-        standbyMode = true;
-        digitalWrite(LED_RED, LOW);
+        else {
+          //Send No Connection message, remote is not connected
+          returnMsg(7);
+        }
       }
       
 
       /*------------------BREAK MODE---------------------*/
       /*--(If resume is cancelled by connecting device)--*/
       else if (strcmp(head, "<BRAKMOD>") == 0) {
-        digitalWrite(LED_BLUE, LOW);
         Serial.print("Standby");
-        char msg[] = {'<', '/', 'B', 'R', 'A', 'K', 'M', 'O', 'D', '>'};
-        Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-        for (int i = 0; i < 10; i++){
-          Udp.write(msg[i]);
+        if (initConnect == false) {
+          //Checl remote credentials
+          if (Udp.remoteIP() == currentIP){
+            //Send Break Mode confirmation message
+            returnMsg(4);
+            //Reset all DMX channels to Zero
+            for (int i = 0; i < 512; i++){
+              dmxbuffer[i + 1] = 0;
+            }
+            copyDMXToOutput();
+            //Set device to active mode
+            standbyMode = false;
+            digitalWrite(LED_RED, HIGH);
+            }
+          else{
+            //Send override message, remote is not the master
+            returnMsg(3);
+          }
         }
-        Udp.endPacket();
-        for (int i = 0; i < 512; i++){
-          dmxbuffer[i + 1] = 0;
+        else {
+          //Send No Connection message, remote is not connected
+          returnMsg(7);
         }
-        copyDMXToOutput();
-        standbyMode = false;
-        digitalWrite(LED_RED, HIGH);
       }
 
 
       /*---------WAKE UP DEVICE FROM STANDBY--------*/
       /*------ (RETURNS CURRENT CHANNEL STATES)-----*/
       else if (strcmp(head, "<WAKE_UP>") == 0) {
-        digitalWrite(LED_BLUE, LOW);
         Serial.print('Wake Up');
-        char msg[] = {'<', '/', 'W', 'A', 'K', 'E', '_', 'U', 'P', '>'};
-        Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-        for (int i = 0; i < 10; i++){
-          Udp.write(msg[i]);
+        if (initConnect == false){
+          //Check remote credentials
+          if (Udp.remoteIP() == currentIP){
+            char msg[] = {'<', '/', 'W', 'A', 'K', 'E', '_', 'U', 'P', '>'};
+            Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
+            for (int i = 0; i < 10; i++){
+              Udp.write(msg[i]);
+            }
+            for (int i = 0; i < 512; i++) {
+              Udp.write(dmxbuffer[i + 1]);
+            }
+            Udp.endPacket();
+            standbyMode = false;
+            digitalWrite(LED_RED, HIGH);
+          }
+          else{
+            //Send override message, remote is not the master
+            returnMsg(3);
+          }
+      }
+      else {
+        //Send No Connection message, remote is not connected
+        returnMsg(7);
         }
-        for (int i = 0; i < 512; i++) {
-          Udp.write(dmxbuffer[i + 1]);
+      }
+
+      /*-------SEND REMOTE RESET COMMAND-------*/
+      /*---------------------------------------*/
+      else if (strcmp(head, "<!RESET!>") == 0) {
+        if (initConnect == false) {
+          if (Udp.remoteIP() == currentIP) {
+            digitalWrite(LED_RED, LOW);
+            while (1) {
+              digitalWrite(LED_BLUE, HIGH);
+              delay(250);
+              digitalWrite(LED_BLUE, LOW);
+              delay(250);
+              }
+          }
+          else {
+            //Send override message, remote is not the master
+            returnMsg(3);
+          }
         }
-        Udp.endPacket();
-        standbyMode = false;
-        digitalWrite(LED_RED, HIGH);
+        else {
+        //Send No Connection message, remote is not connected
+        returnMsg(7);
+        }
       }
 
 
       /*-----INVALID MESSAGE RECEIVED-----*/
       /*----------------------------------*/
       else{
-        digitalWrite(LED_BLUE, LOW);
-        char msg[] = {'<', '/', 'I', 'N', 'V', 'A', 'L', 'I', 'D', '>'};
-        Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-        for (int i = 0; i < 10; i++){
-          Udp.write(msg[i]);
-        }
-        Udp.endPacket();
+        //Packet not properly formatted therefore signal invalid message
+        returnMsg(6);
       }
-    Serial.printf("UDP packet contents: %s\n", incomingPacket);
     }
-  esp_task_wdt_feed();
+    else{
+      //Packet to small therefore signal invalid message
+      returnMsg(6);
+    }
   }
+  //Reset Watch Dog Timer, else device will auto reset after a second
+  esp_task_wdt_feed();
 }
 
 //END
