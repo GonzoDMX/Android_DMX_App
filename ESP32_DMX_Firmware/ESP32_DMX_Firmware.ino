@@ -23,6 +23,10 @@ char errorReply[] = "INVALID MESSAGE!\n";
 //WIFI Variables------------------------------END//
 
 
+#define LED_RED 26
+#define LED_BLUE 25
+
+const long ledDelay = 250;
 
 //DMX Variables-------------------------------
 #define DMX_DIRECTION_PIN 21
@@ -50,6 +54,9 @@ bool standbyMode = false;
 void setup() {
   Serial.begin(115200);
 
+  pinMode(LED_RED, OUTPUT);
+  pinMode(LED_BLUE, OUTPUT);
+
   pinMode(DMX_DIRECTION_PIN, OUTPUT);
   digitalWrite(DMX_DIRECTION_PIN, HIGH);
 
@@ -65,6 +72,9 @@ void setup() {
     dmxbuffer[i + 1] = 0;
   }
   copyDMXToOutput();
+
+  digitalWrite(LED_BLUE, HIGH);
+  
 }
 
 
@@ -84,7 +94,8 @@ void loop() {
       
       /*-------PARSE INCOMING CHANNEL DATA-------*/
       /*-----------------------------------------*/
-      if (strcmp(head, "<CHANNEL>") == 0){
+      if (strcmp(head, "<CHANNEL>") == 0 && standbyMode == false) {
+        digitalWrite(LED_BLUE, LOW);
         Serial.print("Set Channels");
         int chan = 0;
         for (index; index < 12; index++){
@@ -111,9 +122,21 @@ void loop() {
       }
 
 
+      /*-------Signal that device is in STANDBY Mode-------*/
+      /*---------------------------------------------------*/
+      else if (strcmp(head, "<CHANNEL>") == 0 && standbyMode == true) {
+        char msg[] = {'<', '/', 'R', 'E', 'S', 'U', 'M', 'E', '?', '>'};
+        Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
+        for (int i = 0; i < 10; i++){
+          Udp.write(msg[i]);
+        }
+        Udp.endPacket();
+      }
+
       /*--------------NEW DEVICE IS CONNECTING-------------*/
       /*-----(If device in standby mode ask to resume)-----*/
       else if (strcmp(head, "<CONNECT>")) {
+        digitalWrite(LED_BLUE, LOW);
         Serial.print("Connect");
         if(standbyMode == true){
           char msg[] = {'<', '/', 'R', 'E', 'S', 'U', 'M', 'E', '?', '>'};
@@ -130,6 +153,7 @@ void loop() {
             Udp.write(msg[i]);
           }
           Udp.endPacket();
+          digitalWrite(LED_RED, HIGH);
         }
       }
 
@@ -137,6 +161,7 @@ void loop() {
       /*-------SET DEVICE TO STANDBY MODE-------*/
       /*----------------------------------------*/
       else if (strcmp(head, "<STANDBY>") == 0) {
+        digitalWrite(LED_BLUE, LOW);
         Serial.print("Standby");
         char msg[] = {'<', '/', 'S', 'T', 'A', 'N', 'D', 'B', 'Y', '>'};
         Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
@@ -145,12 +170,14 @@ void loop() {
         }
         Udp.endPacket();
         standbyMode = true;
+        digitalWrite(LED_RED, LOW);
       }
       
 
       /*------------------BREAK MODE---------------------*/
       /*--(If resume is cancelled by connecting device)--*/
       else if (strcmp(head, "<BRAKMOD>") == 0) {
+        digitalWrite(LED_BLUE, LOW);
         Serial.print("Standby");
         char msg[] = {'<', '/', 'B', 'R', 'A', 'K', 'M', 'O', 'D', '>'};
         Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
@@ -163,12 +190,14 @@ void loop() {
         }
         copyDMXToOutput();
         standbyMode = false;
+        digitalWrite(LED_RED, HIGH);
       }
 
 
       /*---------WAKE UP DEVICE FROM STANDBY--------*/
       /*------ (RETURNS CURRENT CHANNEL STATES)-----*/
       else if (strcmp(head, "<WAKE_UP>") == 0) {
+        digitalWrite(LED_BLUE, LOW);
         Serial.print('Wake Up');
         char msg[] = {'<', '/', 'W', 'A', 'K', 'E', '_', 'U', 'P', '>'};
         Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
@@ -180,12 +209,14 @@ void loop() {
         }
         Udp.endPacket();
         standbyMode = false;
+        digitalWrite(LED_RED, HIGH);
       }
 
 
       /*-----INVALID MESSAGE RECEIVED-----*/
       /*----------------------------------*/
       else{
+        digitalWrite(LED_BLUE, LOW);
         char msg[] = {'<', '/', 'I', 'N', 'V', 'A', 'L', 'I', 'D', '>'};
         Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
         for (int i = 0; i < 10; i++){
