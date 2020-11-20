@@ -20,6 +20,8 @@ unsigned int localUdpPort = 4210;  // local port to listen on
 char incomingPacket[548];  // buffer for incoming packets
 char  replyPacket[] = "Hi there! Got the message :-)";  // a reply string to send back
 char errorReply[] = "INVALID MESSAGE!\n";
+
+const int remPort = 9001;
 //WIFI Variables------------------------------END//
 
 
@@ -84,7 +86,7 @@ void setup() {
 
 
 void returnMsg(int index) {
-  Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
+  Udp.beginPacket(Udp.remoteIP(), remPort);
   switch (index) {
     case 1:
     {
@@ -159,6 +161,7 @@ void loop() {
     Serial.printf("Received %d bytes from %s, port %d\n", packetSize, Udp.remoteIP().toString().c_str(), Udp.remotePort());
     int len = Udp.read(incomingPacket, 548);
     //Check incoming packet size
+    Serial.printf(incomingPacket);
     if (len > 9) {
       int index = 0;
       for (index; index < 9; index++){
@@ -193,7 +196,7 @@ void loop() {
               }
               copyDMXToOutput();
               //Send reply message </'# of Channels Set'>
-              Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
+              Udp.beginPacket(Udp.remoteIP(), remPort);
               for (int i = 0; i < 6; i++){
                 Udp.write(msg[i]);
               }
@@ -346,10 +349,12 @@ void loop() {
           //Check remote credentials
           if (Udp.remoteIP() == currentIP){
             char msg[] = {'<', '/', 'W', 'A', 'K', 'E', '_', 'U', 'P', '>'};
-            Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
+            Udp.beginPacket(Udp.remoteIP(), remPort);
             for (int i = 0; i < 10; i++){
               Udp.write(msg[i]);
             }
+            Udp.endPacket();
+            Udp.beginPacket(Udp.remoteIP(), remPort);
             for (int i = 0; i < 512; i++) {
               Udp.write(dmxbuffer[i + 1]);
             }
@@ -368,28 +373,17 @@ void loop() {
         }
       }
 
+
       /*-------SEND REMOTE RESET COMMAND-------*/
       /*---------------------------------------*/
       else if (strcmp(head, "<!RESET!>") == 0) {
-        if (initConnect == false) {
-          if (Udp.remoteIP() == currentIP) {
-            digitalWrite(LED_RED, LOW);
-            while (1) {
-              digitalWrite(LED_BLUE, HIGH);
-              delay(250);
-              digitalWrite(LED_BLUE, LOW);
-              delay(250);
-              }
+        digitalWrite(LED_RED, LOW);
+        while (1) {
+          digitalWrite(LED_BLUE, HIGH);
+          delay(250);
+          digitalWrite(LED_BLUE, LOW);
+          delay(250);
           }
-          else {
-            //Send override message, remote is not the master
-            returnMsg(3);
-          }
-        }
-        else {
-        //Send No Connection message, remote is not connected
-        returnMsg(7);
-        }
       }
 
 
