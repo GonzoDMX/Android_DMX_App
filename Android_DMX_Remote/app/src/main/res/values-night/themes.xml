@@ -1,0 +1,19 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.Android_DMX_Remote" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/dark_velvet</item>
+        <item name="colorPrimaryVariant">@color/black_velvet</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/velvet</item>
+        <item name="colorSecondaryVariant">@color/velvet</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+        <item name="colorControlNormal">?attr/colorOnPrimary</item>
+        <item name="android:navigationBarColor" tools:targetApi="lollipop">?attr/colorPrimaryVariant</item>
+    </style>
+
+</resources>

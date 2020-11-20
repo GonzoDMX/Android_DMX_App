@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+    android:orientation="vertical"
+    android:padding="1dp">
+
+    <!--android:background="@android:color/white"-->
+
+
+    <Button
+        android:id="@+id/rowName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Button"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:backgroundTint="@color/white"
+        style="@style/TextAppearance.AppCompat.Widget.Button.Borderless.Colored"/>
+
+
+</LinearLayout>

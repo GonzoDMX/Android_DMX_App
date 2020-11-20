@@ -1,0 +1,20 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.Android_DMX_Remote" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/warm_sun</item>
+        <item name="colorPrimaryVariant">@color/dark_sun</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/golden_sun</item>
+        <item name="colorSecondaryVariant">@color/golden_sun</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+        <item name="android:colorBackground">@color/light_velvet</item>
+        <item name="colorControlNormal">?attr/colorOnPrimary</item>
+        <item name="android:navigationBarColor" tools:targetApi="lollipop">?attr/colorPrimaryVariant</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+</resources>
