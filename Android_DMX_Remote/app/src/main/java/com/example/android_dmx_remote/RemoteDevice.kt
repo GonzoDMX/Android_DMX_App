@@ -6,6 +6,7 @@ object RemoteDevice {
     private var ipAddress = "192.168.4.1"
     private var port = 4210
     private var status = false
+    private var warning = false
 
     fun setAddress(address: String) {
         ipAddress = address
@@ -19,6 +20,10 @@ object RemoteDevice {
         status = flag
     }
 
+    fun setAlertStatus(flag:Boolean){
+        warning = flag
+    }
+
     fun getRemoteIP(): String {
         return ipAddress
     }
@@ -29,5 +34,9 @@ object RemoteDevice {
 
     fun getConnectionStatus(): Boolean{
         return status
+    }
+
+    fun getAlertStatus(): Boolean {
+        return warning
     }
 }

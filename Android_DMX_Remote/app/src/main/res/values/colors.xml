@@ -8,23 +8,28 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
+    <color name="light_background">#FFCC80</color>
+    <color name="shade_background">#D8AC6B</color>
     <color name="transparent">#00FFFFFF</color>
     <color name="android_green">#a4c639</color>
+    <color name="dark_android_green">#89A52F</color>
     <color name="moving_red">#DA0000</color>
     <color name="stop_blue">#0000FF</color>
     <color name="null_grey">#36454f</color>
     <color name="blue">#0288D1</color>
     <color name="blue_dark">#005B9F</color>
     <color name="blue_light">#81D4FA</color>
-    <color name="charcoal_dark">#121212</color>
+    <color name="charcoal_dark">#191919</color>
     <color name="off_black">#202020</color>
     <color name="old_black">#282828</color>
     <color name="off_grey">#303030</color>
     <color name="golden_sun">#FF5100</color>
-    <color name="warm_sun">#BE0000</color>
-    <color name="dark_sun">#7A0000</color>
+    <color name="warm_sun">#EA8C01</color>
+    <color name="alt_sun">#DA8200</color>
+    <color name="dark_sun">#8F5600</color>
     <color name="light_velvet">#FFB0B0</color>
     <color name="velvet">#420042</color>
     <color name="dark_velvet">#2c0038</color>
+    <color name="alt_velvet">#330040</color>
     <color name="black_velvet">#200029</color>
 </resources>

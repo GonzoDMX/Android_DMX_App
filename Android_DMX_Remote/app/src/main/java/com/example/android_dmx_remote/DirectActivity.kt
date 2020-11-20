@@ -11,12 +11,15 @@ import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.example.android_dmx_ui_sketch.AnimAPO.shakeError
-import com.example.android_dmx_ui_sketch.AnimAPO.slideOut
-import com.example.android_dmx_ui_sketch.MathAPO.mapRange
-import com.example.android_dmx_ui_sketch.RegexAPO.cmdLineCheck
-import com.example.android_dmx_ui_sketch.RegexAPO.splitChannels
+import androidx.core.widget.ImageViewCompat.setImageTintList
+import com.example.android_dmx_remote.AnimAPO.shakeError
+import com.example.android_dmx_remote.AnimAPO.slideOut
+import com.example.android_dmx_remote.MathAPO.mapRange
+import com.example.android_dmx_remote.RegexAPO.cmdLineCheck
+import com.example.android_dmx_remote.RegexAPO.splitChannels
 import kotlinx.android.synthetic.main.activity_direct_remote.*
+import kotlinx.android.synthetic.main.activity_direct_remote.button_online
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -26,28 +29,50 @@ import kotlinx.coroutines.launch
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 open class DirectActivity : AppCompatActivity() {
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_direct_remote)
         setSupportActionBar(findViewById(R.id.toolbar_direct))
 
-
-        //Set EditText Color Based on Theme
-        when (resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)) {
-            Configuration.UI_MODE_NIGHT_YES -> { text_cmdline.setTextColor(Color.WHITE) }
-            Configuration.UI_MODE_NIGHT_NO -> {text_cmdline.setTextColor(Color.BLACK)}
-            Configuration.UI_MODE_NIGHT_UNDEFINED -> {}
-        }
-
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         supportActionBar!!.setDisplayShowHomeEnabled(true)
+
+        if (RemoteDevice.getConnectionStatus()) {
+            button_online.compoundDrawableTintList = ColorStateList.valueOf(Color.GREEN)
+
+        } else {
+            button_online.compoundDrawableTintList = ColorStateList.valueOf(Color.RED)
+        }
 
         fillTableHeader()
         initializeChannels()
 
         // Checks the orientation of the screen
         val orientation = resources.configuration.orientation
+
+        button_addcue.setOnClickListener {
+            Log.d("CLICK", "Add Cue")
+            val cuedialog = CreateCueDialog(this, ChannelHolder.levels)
+            cuedialog.show()
+        }
+
+        //Prevents a crash when going into landscape mode
         if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+
+            //Set EditText Color Based on Theme
+            when (resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)) {
+                Configuration.UI_MODE_NIGHT_YES -> {
+                    text_cmdline.setTextColor(Color.WHITE)
+                }
+                Configuration.UI_MODE_NIGHT_NO -> {
+                    text_cmdline.setTextColor(Color.BLACK)
+                }
+                Configuration.UI_MODE_NIGHT_UNDEFINED -> {
+                }
+            }
+
+
             text_cmdline.isEnabled = false
 
             //Sets flag to toggle Time button input function between "t" and "."
@@ -55,6 +80,7 @@ open class DirectActivity : AppCompatActivity() {
 
             //Preset color of progress bar
             progress_time.progressTintList = ColorStateList.valueOf(Color.RED)
+
 
             button_zero.setOnClickListener {
                 text_cmdline.append("0")
@@ -218,6 +244,9 @@ open class DirectActivity : AppCompatActivity() {
         }
     }
 
+    private fun createCue(name: String) {
+        Log.d("DIALOG", "Create new cue")
+    }
 
     //Clear text from command line
     private fun textFlyOut() {
@@ -259,11 +288,11 @@ open class DirectActivity : AppCompatActivity() {
                 //If connected to ESP32 Broadcast Channel Values
                 if(RemoteDevice.getConnectionStatus()) {
                     Thread(
-                        ClientChannelsUDP(
-                            RemoteDevice.getRemoteIP(),
-                            RemoteDevice.getRemotePort(),
-                            ChannelHolder.levels
-                        )
+                            ClientChannelsUDP(
+                                    RemoteDevice.getRemoteIP(),
+                                    RemoteDevice.getRemotePort(),
+                                    ChannelHolder.levels
+                            )
                     ).start()
                 }
             }
@@ -302,10 +331,10 @@ open class DirectActivity : AppCompatActivity() {
                     //If connected to ESP32 Broadcast Channel Values
                     if(RemoteDevice.getConnectionStatus()) {
                         Thread(
-                            ClientChannelsUDP(
-                                RemoteDevice.getRemoteIP(),
-                                RemoteDevice.getRemotePort(), pushArray
-                            )
+                                ClientChannelsUDP(
+                                        RemoteDevice.getRemoteIP(),
+                                        RemoteDevice.getRemotePort(), pushArray
+                                )
                         ).start()
                     }
                     val loopEnd = System.currentTimeMillis()
@@ -320,11 +349,11 @@ open class DirectActivity : AppCompatActivity() {
                 //If connected to ESP32 Broadcast Channel Values
                 if(RemoteDevice.getConnectionStatus()) {
                     Thread(
-                        ClientChannelsUDP(
-                            RemoteDevice.getRemoteIP(),
-                            RemoteDevice.getRemotePort(),
-                            pushArray
-                        )
+                            ClientChannelsUDP(
+                                    RemoteDevice.getRemoteIP(),
+                                    RemoteDevice.getRemotePort(),
+                                    pushArray
+                            )
                     ).start()
                 }
                 button_enter.isEnabled = true
@@ -597,7 +626,7 @@ open class DirectActivity : AppCompatActivity() {
             when {
                 intensity == 0 -> { textView.setTextColor(ContextCompat.getColor(textView.context, R.color.stop_blue)) }
                 fading -> { textView.setTextColor(ContextCompat.getColor(textView.context, R.color.moving_red)) }
-                else -> { textView.setTextColor(ContextCompat.getColor(textView.context, R.color.android_green)) }
+                else -> { textView.setTextColor(ContextCompat.getColor(textView.context, R.color.dark_android_green)) }
             }
         }
     }

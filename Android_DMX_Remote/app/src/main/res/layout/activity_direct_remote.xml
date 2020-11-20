@@ -12,12 +12,13 @@
         android:id="@+id/toolbar_direct"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
+        android:background="?attr/colorPrimaryDark"
         android:minHeight="?attr/actionBarSize"
         app:titleTextColor="@color/white"
         app:subtitleTextColor="@color/white"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/constlay_top" >
+
 
         <Button
             android:id="@+id/button_online"
@@ -33,6 +34,24 @@
             app:iconSize="30dp"
             app:iconTint="@android:color/holo_green_light"
             tools:ignore="RtlHardcoded" />
+
+        <Button
+            android:id="@+id/button_addcue"
+            style="@style/Widget.AppCompat.Button.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_margin="5dp"
+            android:text=""
+            app:elevation="10dp"
+            app:icon="@drawable/ic_add_white_24dp"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:iconSize="30dp"
+            app:iconTint="@android:color/white"
+            tools:ignore="RtlHardcoded"
+            tools:layout_editor_absoluteX="272dp"
+            tools:layout_editor_absoluteY="5dp" />
 
     </androidx.appcompat.widget.Toolbar>
 
@@ -259,6 +278,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:divider="?android:attr/dividerVertical"
+                    android:background="?attr/colorSecondaryVariant"
                     android:showDividers="middle"
                     android:layout_weight="0.9" >
 
@@ -269,6 +289,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:divider="?android:attr/dividerVertical"
+                    android:background="?attr/colorSecondaryVariant"
                     android:showDividers="middle"
                     android:layout_weight="0.9" >
 
@@ -279,6 +300,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:divider="?android:attr/dividerVertical"
+                    android:background="?attr/colorSecondaryVariant"
                     android:showDividers="middle"
                     android:layout_weight="0.9" >
 
@@ -289,6 +311,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:divider="?android:attr/dividerVertical"
+                    android:background="?attr/colorSecondaryVariant"
                     android:showDividers="middle"
                     android:layout_weight="0.9" >
 
@@ -299,6 +322,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:divider="?android:attr/dividerVertical"
+                    android:background="?attr/colorSecondaryVariant"
                     android:showDividers="middle"
                     android:layout_weight="0.9" >
 
@@ -309,6 +333,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:divider="?android:attr/dividerVertical"
+                    android:background="?attr/colorSecondaryVariant"
                     android:showDividers="middle"
                     android:layout_weight="0.9" >
 
@@ -319,6 +344,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:divider="?android:attr/dividerVertical"
+                    android:background="?attr/colorSecondaryVariant"
                     android:showDividers="middle"
                     android:layout_weight="0.9" >
 
@@ -329,6 +355,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:divider="?android:attr/dividerVertical"
+                    android:background="?attr/colorSecondaryVariant"
                     android:showDividers="middle"
                     android:layout_weight="0.9" >
 
@@ -339,6 +366,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:divider="?android:attr/dividerVertical"
+                    android:background="?attr/colorSecondaryVariant"
                     android:showDividers="middle"
                     android:layout_weight="0.9" >
 
@@ -349,6 +377,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:divider="?android:attr/dividerVertical"
+                    android:background="?attr/colorSecondaryVariant"
                     android:showDividers="middle"
                     android:layout_weight="0.9" >
 
@@ -400,6 +429,7 @@
                 android:textSize="24sp"
                 android:inputType="none"
                 tools:ignore="LabelFor" />
+
 
         </TableRow>
 
@@ -651,8 +681,6 @@
                 android:layout_weight="1"
                 android:text="@string/at"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:foreground="@drawable/button_simple_for"
-                android:background="@drawable/button_simple_border"
                 tools:ignore="ButtonStyle" />
 
         </TableRow>

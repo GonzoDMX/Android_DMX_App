@@ -1,21 +1,19 @@
 package com.example.android_dmx_remote
 
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.drawable.AnimationDrawable
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.constraintlayout.widget.ConstraintLayout
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -24,6 +22,7 @@ import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
+
 
     private var checkConnection: Boolean = false
 
@@ -43,8 +42,44 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar_main))
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
 
+
+        val theme = (PrefAccessOr.getValue(
+                this,
+                "Theme",
+                "SYSTEM DEFAULT"
+        ))
+        Log.d("THEME", theme)
+        when(theme) {
+            //Set Default Theme
+            "SYSTEM DEFAULT" -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                ListenerDaemon.theme = "SYSTEM DEFAULT"
+            }
+            //Set Light Mode
+            "LIGHT THEME" -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                ListenerDaemon.theme = "LIGHT THEME"
+            }
+            //Set Dark Mode
+            "DARK THEME" -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                ListenerDaemon.theme = "DARK THEME"
+            }
+        }
+
+        //Set EditText Color Based on Theme
+        when (resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)) {
+            Configuration.UI_MODE_NIGHT_YES -> {
+                ListenerDaemon.mode = 2
+            }
+            Configuration.UI_MODE_NIGHT_NO -> {
+                ListenerDaemon.mode = 1
+            }
+            Configuration.UI_MODE_NIGHT_UNDEFINED -> {
+                ListenerDaemon.mode = 0
+            }
+        }
 
 
         if (!ListenerDaemon.status) {
@@ -53,8 +88,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         setConnection()
-
-        button_online.setOnClickListener{
+        //Blocks search dialog until connection returns
+        //Coroutine is to prevent App from hanging
+        GlobalScope.launch(context = Dispatchers.Main) {
+            searchDialog()
+        }
+        button_online.setOnClickListener {
             if (!checkConnection) {
                 checkConnection = true
                 setConnection()
@@ -62,8 +101,20 @@ class MainActivity : AppCompatActivity() {
         }
 
         button_dcontrol.setOnClickListener {
-            Log.d("GOTO", "Direct Control")
+            Log.d("CLICK", "DMX REMOTE")
             goToDirect()
+        }
+
+        button_cuelist.setOnClickListener {
+            Log.d("CLICK", "SETTINGS")
+            goToCueList()
+        }
+
+
+        button_settings.setOnClickListener {
+            Log.d("CLICK", "SETTINGS")
+            val set_dialog = SettingsDialog(this)
+            set_dialog.show()
         }
 
     }
@@ -89,6 +140,14 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
     }
+
+
+    private fun goToCueList() {
+        val intent = Intent(this, CueListActivity::class.java).apply {}
+        startActivity(intent)
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+    }
+
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun setConnection() {
@@ -132,30 +191,36 @@ class MainActivity : AppCompatActivity() {
                     Log.d("THREADMAIN", "RETURN CONNECTED")
                     RemoteDevice.setConnectionStatus(true)
                     button_online.compoundDrawableTintList = ColorStateList.valueOf(Color.GREEN)
-                }
-                else if (ThreadReturn.message == "</WAKE_UP>") {
+                } else if (ThreadReturn.message == "</WAKE_UP>") {
                     Log.d("THREADMAIN", "WAKE UP")
                     RemoteDevice.setConnectionStatus(true)
                     button_online.compoundDrawableTintList = ColorStateList.valueOf(Color.GREEN)
-                }
-                else if (ThreadReturn.message == "</BRAKMOD>") {
+                } else if (ThreadReturn.message == "</BRAKMOD>") {
                     Log.d("THREADMAIN", "Break Mode")
                     RemoteDevice.setConnectionStatus(true)
                     button_online.compoundDrawableTintList = ColorStateList.valueOf(Color.GREEN)
-                }
-                else if (ThreadReturn.message == "</STANDBY>") {
+                } else if (ThreadReturn.message == "</STANDBY>") {
                     wakeDialog()
                 } else {
                     Log.d("THREADMAIN", "INVALID RETURN")
                     Log.d("RETURN", ThreadReturn.message)
-                    errorDialog("Invalid response from device: " + ThreadReturn.message)
-                    RemoteDevice.setConnectionStatus(false)
+                    if (!RemoteDevice.getAlertStatus()) {
+                        ListenerDaemon.message = "Invalid response from device: " + ThreadReturn.message
+                        RemoteDevice.setConnectionStatus(false)
+                        RemoteDevice.setAlertStatus(true)
+                    } else {
+                        errorDialog("Invalid response from device: " + ThreadReturn.message)
+                        RemoteDevice.setConnectionStatus(false)
+                    }
                     button_online.compoundDrawableTintList = ColorStateList.valueOf(Color.RED)
                 }
             } else {
                 Log.d("THREADMAIN", "RETURN TIMEOUT")
-                errorDialog("No device detected!")
+                ListenerDaemon.message = "No DMX device found!"
                 RemoteDevice.setConnectionStatus(false)
+                if (!RemoteDevice.getAlertStatus()) {
+                    RemoteDevice.setAlertStatus(true)
+                }
                 button_online.compoundDrawableTintList = ColorStateList.valueOf(Color.RED)
             }
             //Reset Thread Return
@@ -192,11 +257,15 @@ class MainActivity : AppCompatActivity() {
         alertDialog.setMessage("ESP32 on Standby, press Wake to restore channel" +
                 "levels from ESP32 or press Reset to set all levels to zero")
         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "WAKE"
-        ) { dialog, which -> dialog.dismiss()
-            wakeDevice() }
+        ) { dialog, _ ->
+            dialog.dismiss()
+            wakeDevice()
+        }
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "RESET"
-        ) { dialog, which -> dialog.dismiss()
-            resetDevice() }
+        ) { dialog, _ ->
+            dialog.dismiss()
+            resetDevice()
+        }
         alertDialog.show()
     }
 
@@ -205,8 +274,38 @@ class MainActivity : AppCompatActivity() {
         alertDialog.setTitle("Alert")
         alertDialog.setMessage(message)
         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "DISMISS"
-        ) { dialog, which -> dialog.dismiss() }
+        ) { dialog, _ -> dialog.dismiss() }
         alertDialog.show()
+    }
+
+
+    private suspend fun searchDialog() {
+        Log.d("DIALOG", "Search is called")
+        if (ListenerDaemon.search) {
+        } else {
+            val searchDialog = AlertDialog.Builder(this@MainActivity).create()
+            searchDialog.setTitle("Hold on a minute")
+            searchDialog.setMessage("Searching for DMX device")
+            searchDialog.setCancelable(false)
+            searchDialog.show()
+            delay(1000)
+            while (!RemoteDevice.getAlertStatus()) {
+                searchDialog.setMessage("Searching for DMX device")
+                delay(250)
+                searchDialog.setMessage("Searching for DMX device.")
+                delay(250)
+                searchDialog.setMessage("Searching for DMX device..")
+                delay(250)
+                searchDialog.setMessage("Searching for DMX device...")
+                delay(250)
+            }
+            if (!RemoteDevice.getConnectionStatus()) {
+                searchDialog.setTitle("Alert")
+                searchDialog.setMessage(ListenerDaemon.message)
+                delay(2000)
+            }
+            searchDialog.dismiss()
+        }
     }
 
 }

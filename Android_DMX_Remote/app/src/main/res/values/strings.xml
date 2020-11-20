@@ -83,4 +83,5 @@
     <string name="chan">Chan</string>
     <string name="dot_time">.Time</string>
     <string name="add_fixture_button">Add Fixture Button</string>
+    <string name="list">+List</string>
 </resources>

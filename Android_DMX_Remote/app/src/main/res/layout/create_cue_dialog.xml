@@ -1,6 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <EditText
+        android:id="@+id/edit_CueName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Cue Name"
+        android:layout_marginRight="30dp"
+        app:layout_constraintBottom_toTopOf="@id/edit_FadeTime"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/text_CueName" />
+
+
+    <TextView
+        android:id="@+id/text_CueName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cue Name:"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="5dp"
+        app:layout_constraintBottom_toBottomOf="@+id/edit_CueName"
+        app:layout_constraintEnd_toStartOf="@id/edit_CueName"
+        app:layout_constraintTop_toTopOf="@+id/edit_CueName"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <EditText
+        android:id="@+id/edit_FadeTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="number"
+        android:text="0.0"
+        android:layout_marginRight="30dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/text_FadeTime"/>
+
+    <TextView
+        android:id="@+id/text_FadeTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Fade Time:"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="5dp"
+        app:layout_constraintBottom_toBottomOf="@+id/edit_FadeTime"
+        app:layout_constraintEnd_toStartOf="@id/edit_FadeTime"
+        app:layout_constraintTop_toTopOf="@+id/edit_FadeTime"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <Button
+        android:id="@+id/button_create"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="Create"
+        app:layout_constraintBottom_toBottomOf="@+id/button_cancel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/button_cancel"
+        app:layout_constraintTop_toTopOf="@+id/button_cancel" />
+
+    <Button
+        android:id="@+id/button_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="Cancel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/button_create"
+        app:layout_constraintTop_toBottomOf="@id/edit_FadeTime" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
