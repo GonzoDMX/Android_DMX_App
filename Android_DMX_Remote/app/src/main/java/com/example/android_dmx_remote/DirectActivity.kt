@@ -279,7 +279,7 @@ open class DirectActivity : AppCompatActivity() {
             if (countDown == 0) {
                 updateChildDMX(cue.chanSelect!!, cue.intensityVal!!, false)
                 var index = 0
-                cue.chanSelect.forEach { channel -> ChannelHolder.levels[channel - 1] = cue.intensityVal
+                cue.chanSelect.forEach { channel -> Canaux.levels[channel - 1] = cue.intensityVal
                     index += 1
                 }
                 //If connected to ESP32 Broadcast Channel Values
@@ -288,7 +288,7 @@ open class DirectActivity : AppCompatActivity() {
                             ClientChannelsUDP(
                                     RemoteDevice.getRemoteIP(),
                                     RemoteDevice.getRemotePort(),
-                                    ChannelHolder.levels
+                                    Canaux.levels
                             )
                     ).start()
                 }
@@ -300,14 +300,14 @@ open class DirectActivity : AppCompatActivity() {
                 val maxChannel = cue.chanSelect?.maxOrNull() ?: 0
                 var pushArray = ArrayList<Int>()
                 for (i in 0 until maxChannel){
-                    pushArray.add(ChannelHolder.levels[i])
+                    pushArray.add(Canaux.levels[i])
                 }
                 while(count >= 0) {
                     val loopStart = System.currentTimeMillis()
                     val tempList = ArrayList<Int>()
                     tempList.add(0)
                     for (channel in cue.chanSelect!!){
-                        val init = ChannelHolder.levels[channel - 1]
+                        val init = Canaux.levels[channel - 1]
                         val targ = cue.intensityVal!!
                         if (init != targ) {
                             tempList[0] = channel
@@ -340,7 +340,7 @@ open class DirectActivity : AppCompatActivity() {
                 }
                 updateChildDMX(cue.chanSelect!!, cue.intensityVal!!, false)
                 for(channel in cue.chanSelect) {
-                    ChannelHolder.levels[channel - 1] = cue.intensityVal
+                    Canaux.levels[channel - 1] = cue.intensityVal
                     pushArray[channel - 1] = cue.intensityVal
                 }
                 //If connected to ESP32 Broadcast Channel Values
@@ -375,7 +375,6 @@ open class DirectActivity : AppCompatActivity() {
             //Set Progress Bar Green
             progress_time.progressTintList = ColorStateList.valueOf(Color.GREEN)
             progress_time.progress = 100
-            //Shake command line text
             delay(200)
             progress_time.progress = 0
             progress_time.progressTintList = ColorStateList.valueOf(Color.RED)
@@ -560,8 +559,8 @@ open class DirectActivity : AppCompatActivity() {
                 val textView = TextView(this)
                 val arrIndex = ((x * 10) + index) -1
                 if (arrIndex < 512) {
-                    textView.text = ChannelHolder.levels[arrIndex].toString()
-                    if (ChannelHolder.levels[arrIndex] > 0) {
+                    textView.text = Canaux.levels[arrIndex].toString()
+                    if (Canaux.levels[arrIndex] > 0) {
                         textView.setTextColor(ContextCompat.getColor(textView.context, R.color.android_green))
                     }
                     else {

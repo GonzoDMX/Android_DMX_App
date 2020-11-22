@@ -27,7 +27,7 @@ class ClientListenUDP() : Runnable {
                     udpSocket.receive(packet)
                     val channels = packet.data
                     for (i in 0 until packet.length) {
-                        ChannelHolder.levels[i] = channels[i].toUByte().toInt()
+                        Canaux.levels[i] = channels[i].toUByte().toInt()
                     }
                 }
                 Log.d("Received data", text)

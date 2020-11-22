@@ -1,10 +1,13 @@
 package com.example.android_dmx_remote
 
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -18,8 +21,12 @@ open class CueListActivity : AppCompatActivity() {
     private var layoutManager:RecyclerView.LayoutManager? = null
     private var adapter:RecyclerView.Adapter<RecyclerCueAdapter.ViewHolder>? = null
 
-    private var editMode = false
+    private val output = OutputManager()
 
+    private var editMode = false
+    private var blackOut = false
+
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cue_list)
@@ -70,27 +77,42 @@ open class CueListActivity : AppCompatActivity() {
         slider_master.addOnChangeListener { slider, value, fromUser ->
             // Responds to when slider's value is changed
             Log.d("SLIDER", value.toString())
+            output.setMaster(value)
             val textVal = value.toString().dropLast(2) + "%"
             text_slider.text = textVal
         }
 
 
+        button_remote.setOnClickListener {
+            Log.d("CLICK", "DMX REMOTE")
+            goToDirect()
+        }
+
         //Toggle Edit Mode
         button_edit.setOnClickListener {
             if(editMode) {
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                    button_edit.compoundDrawableTintList = ColorStateList.valueOf(Color.WHITE)
-                    editMode = false
-                    (adapter as RecyclerCueAdapter).editModeEnable(editMode)
-                }
+                button_edit.compoundDrawableTintList = ColorStateList.valueOf(Color.WHITE)
+                editMode = false
+                (adapter as RecyclerCueAdapter).editModeEnable(editMode)
+
             } else {
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                    button_edit.compoundDrawableTintList = ColorStateList.valueOf(Color.RED)
-                    editMode = true
-                    (adapter as RecyclerCueAdapter).editModeEnable(editMode)
-                }
+                button_edit.compoundDrawableTintList = ColorStateList.valueOf(Color.RED)
+                editMode = true
+                (adapter as RecyclerCueAdapter).editModeEnable(editMode)
             }
             (adapter as RecyclerCueAdapter).notifyDataSetChanged()
+        }
+
+        button_blackout.setOnClickListener {
+            if(blackOut) {
+                button_blackout.setTextColor(Color.WHITE)
+                blackOut = false
+                output.endBlackOut()
+            } else {
+                button_blackout.setTextColor(Color.RED)
+                blackOut = true
+                output.startBlackOut()
+            }
         }
 
     }
@@ -130,6 +152,28 @@ open class CueListActivity : AppCompatActivity() {
                     }
                 }
         ItemTouchHelper(simpleItemTouchCallback)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun goToDirect() {
+        if(editMode){
+            button_edit.compoundDrawableTintList = ColorStateList.valueOf(Color.WHITE)
+            editMode = false
+            (adapter as RecyclerCueAdapter).editModeEnable(editMode)
+        }
+        if(blackOut){
+            button_blackout.setTextColor(Color.WHITE)
+            blackOut = false
+            output.endBlackOut()
+        }
+        val intent = Intent(this, DirectActivity::class.java).apply {}
+        startActivity(intent)
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (adapter as RecyclerCueAdapter).notifyDataSetChanged()
     }
 
     //Catches event when user presses back button

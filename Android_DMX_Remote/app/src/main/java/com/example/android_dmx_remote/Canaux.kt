@@ -1,6 +1,6 @@
 package com.example.android_dmx_remote
 
-object ChannelHolder {
+object Canaux {
     var levels = ArrayList<Int>()
 
     init {

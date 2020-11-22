@@ -77,4 +77,15 @@ object CueListMap {
             this.cues = tempMap
         }
     }
+
+    fun nameFree(name: String): Boolean {
+        if(cueCount > 0) {
+            for (i in 0 until cueCount) {
+                if (cues[i]!!.name == name) {
+                    return false
+                }
+            }
+        }
+        return true
+    }
 }

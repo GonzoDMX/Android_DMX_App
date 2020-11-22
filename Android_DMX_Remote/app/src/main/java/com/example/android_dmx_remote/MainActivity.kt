@@ -105,11 +105,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        button_dcontrol.setOnClickListener {
-            Log.d("CLICK", "DMX REMOTE")
-            goToDirect()
-        }
-
         button_cuelist.setOnClickListener {
             Log.d("CLICK", "SETTINGS")
             goToCueList()
@@ -129,13 +124,6 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         setConnection()
-    }
-
-
-    private fun goToDirect() {
-        val intent = Intent(this, DirectActivity::class.java).apply {}
-        startActivity(intent)
-        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
     }
 
 
