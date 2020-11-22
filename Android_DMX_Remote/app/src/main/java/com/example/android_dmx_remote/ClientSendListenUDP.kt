@@ -23,11 +23,11 @@ class ClientSendListenUDP(ip: String?, port: Int, message: ByteArray) : Runnable
                 try {
                     ThreadReturn.message = ""
                     val message = ByteArray(560)
-                    val packet = DatagramPacket(message, message.size)
+                    val recPacket = DatagramPacket(message, message.size)
                     Log.i("UDP client: ", "about to wait to receive")
                     udpSocket.soTimeout = 2000
-                    udpSocket.receive(packet)
-                    val text = String(message, 0, packet.length)
+                    udpSocket.receive(recPacket)
+                    val text = String(message, 0, recPacket.length)
                     ThreadReturn.message = text
                     ThreadReturn.available = true
                     Log.d("Received text", text)

@@ -6,11 +6,12 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.Window
+import com.example.android_dmx_remote.ChannelHolder.levels
 import kotlinx.android.synthetic.main.create_cue_dialog.*
 
 
 class CreateCueDialog
-(var c: Activity, val levels: ArrayList<Int>) : Dialog(c), View.OnClickListener {
+(var c: Activity) : Dialog(c), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,7 +27,7 @@ class CreateCueDialog
                 val name = edit_CueName.text.toString()
                 val fade = edit_FadeTime.text.toString().toInt()
                 var cue = CueClass(name, levels, fade)
-                CueListMap.cues[name] = cue
+                CueListMap.addCue(cue)
                 Log.d("CUELIST", "CUE CREATED!")
             }
             R.id.button_cancel -> dismiss()

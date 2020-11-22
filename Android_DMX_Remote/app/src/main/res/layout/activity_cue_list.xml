@@ -1,6 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimaryDark"
+        android:minHeight="?attr/actionBarSize"
+        app:titleTextColor="@color/white"
+        app:subtitleTextColor="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" >
+
+        <Button
+            android:id="@+id/button_online"
+            style="@style/Widget.AppCompat.Button.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_margin="5dp"
+            android:text=""
+            app:icon="@android:drawable/presence_offline"
+            app:iconGravity="textStart"
+            app:iconPadding = "0dp"
+            app:iconSize="30dp"
+            app:iconTint="@android:color/holo_green_light" />
+
+        <Button
+            android:id="@+id/button_edit"
+            style="@style/Widget.AppCompat.Button.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_margin="5dp"
+            android:text=""
+            app:icon="@android:drawable/ic_menu_edit"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:iconSize="30dp"
+            app:iconTint="@android:color/white"
+            app:iconTintMode="multiply"
+            tools:layout_editor_absoluteX="272dp"
+            tools:layout_editor_absoluteY="5dp" />
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <Button
+        android:id="@+id/button_blackout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Black Out"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="10dp"
+        app:layout_constraintTop_toBottomOf="@id/toolbar_list"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <com.google.android.material.slider.Slider
+        android:id="@+id/slider_master"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:value="100.0"
+        android:valueFrom="0.0"
+        android:valueTo="100.0"
+        android:stepSize="1.0"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        app:layout_constraintBottom_toTopOf="@id/grid_layout"
+        app:layout_constraintTop_toBottomOf="@id/toolbar_list"
+        app:layout_constraintStart_toEndOf="@id/button_blackout"
+        app:layout_constraintEnd_toStartOf="@id/text_slider"/>
+
+
+    <TextView
+        android:id="@+id/text_slider"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="100%"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        app:layout_constraintBottom_toTopOf="@id/grid_layout"
+        app:layout_constraintTop_toBottomOf="@id/toolbar_list"
+        app:layout_constraintStart_toEndOf="@id/slider_master"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <View
+        android:id="@+id/divider_list"
+        android:layout_width="410dp"
+        android:layout_height="5dp"
+        android:background="?attr/colorPrimary"
+        app:layout_constraintBottom_toTopOf="@+id/grid_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/slider_master" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/grid_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="5dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/button_blackout">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycle_cuelist"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintStart_toStartOf="@id/grid_layout"
+            app:layout_constraintEnd_toEndOf="@id/grid_layout"
+            app:layout_constraintTop_toTopOf="@id/grid_layout"
+            app:layout_constraintBottom_toBottomOf="@id/grid_layout"
+            tools:listitem="@layout/cardview_cue"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

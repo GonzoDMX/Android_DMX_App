@@ -1,6 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/card_cue"
+    android:layout_margin="5dp"
+    app:cardBackgroundColor="?attr/colorPrimaryDark"
+    app:cardElevation="3dp"
+    app:contentPadding="4dp"
+    android:foreground="?selectableItemBackground"
+    android:clickable="true">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/const_cardcue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp">
+
+
+        <TextView
+            android:id="@+id/text_cuename"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cue Name"
+            android:textSize="30dp"
+            app:layout_constraintStart_toStartOf="@id/const_cardcue"
+            app:layout_constraintEnd_toEndOf="@id/const_cardcue"
+            app:layout_constraintTop_toTopOf="@id/const_cardcue" />
+
+        <ImageView
+            android:id="@+id/image_card"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toEndOf="@id/const_cardcue"
+            app:layout_constraintTop_toTopOf="@id/const_cardcue"
+            app:srcCompat="@android:drawable/ic_menu_edit" />
+
+        <TextView
+            android:id="@+id/text_fadetitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fade Time: "
+            app:layout_constraintStart_toStartOf="@id/const_cardcue"
+            app:layout_constraintEnd_toStartOf="@id/text_fadetime"
+            app:layout_constraintTop_toBottomOf="@id/text_cuename"
+            app:layout_constraintBottom_toBottomOf="@id/const_cardcue"/>
+
+        <TextView
+            android:id="@+id/text_fadetime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1.5"
+            app:layout_constraintStart_toEndOf="@id/text_fadetitle"
+            app:layout_constraintEnd_toEndOf="@id/const_cardcue"
+            app:layout_constraintTop_toBottomOf="@id/text_cuename"
+            app:layout_constraintBottom_toBottomOf="@id/const_cardcue"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

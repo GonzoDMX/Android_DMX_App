@@ -392,8 +392,8 @@
     <View
         android:id="@+id/divider"
         android:layout_width="410dp"
-        android:layout_height="4dp"
-        android:background="?android:attr/listDivider"
+        android:layout_height="5dp"
+        android:background="?attr/colorPrimary"
         app:layout_constraintBottom_toTopOf="@+id/table_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

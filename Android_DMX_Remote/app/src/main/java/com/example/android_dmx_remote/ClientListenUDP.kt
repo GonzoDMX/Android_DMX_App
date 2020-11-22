@@ -9,6 +9,7 @@ class ClientListenUDP() : Runnable {
 
     private var port = 9001
 
+    @ExperimentalUnsignedTypes
     override fun run() {
         var run = true
         val udpSocket = DatagramSocket(port)
@@ -35,9 +36,5 @@ class ClientListenUDP() : Runnable {
                 run = false
             }
         }
-    }
-
-    private fun parseIncoming(message: ByteArray) {
-
     }
 }

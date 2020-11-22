@@ -26,6 +26,8 @@ class MainActivity : AppCompatActivity() {
 
     private var checkConnection: Boolean = false
 
+    private var searchDialog: AlertDialog? = null
+
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         val constLayout = this.main_layout
@@ -87,7 +89,10 @@ class MainActivity : AppCompatActivity() {
             ListenerDaemon.status = true
         }
 
-        setConnection()
+        if(!RemoteDevice.getAlertStatus()) {
+            setConnection()
+        }
+
         //Blocks search dialog until connection returns
         //Coroutine is to prevent App from hanging
         GlobalScope.launch(context = Dispatchers.Main) {
@@ -124,14 +129,6 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         setConnection()
-    }
-
-    @RequiresApi(Build.VERSION_CODES.M)
-    override fun onDestroy() {
-        super.onDestroy()
-        Thread(ClientSendUDP(RemoteDevice.getRemoteIP(),
-                RemoteDevice.getRemotePort(),
-                Message.standby)).start()
     }
 
 
@@ -283,29 +280,40 @@ class MainActivity : AppCompatActivity() {
         Log.d("DIALOG", "Search is called")
         if (ListenerDaemon.search) {
         } else {
-            val searchDialog = AlertDialog.Builder(this@MainActivity).create()
-            searchDialog.setTitle("Hold on a minute")
-            searchDialog.setMessage("Searching for DMX device")
-            searchDialog.setCancelable(false)
-            searchDialog.show()
+            searchDialog = AlertDialog.Builder(this@MainActivity).create()
+            searchDialog!!.setTitle("Hold on a minute")
+            searchDialog!!.setMessage("Searching for DMX device")
+            searchDialog!!.setCancelable(false)
+            searchDialog!!.show()
             delay(1000)
             while (!RemoteDevice.getAlertStatus()) {
-                searchDialog.setMessage("Searching for DMX device")
+                searchDialog!!.setMessage("Searching for DMX device")
                 delay(250)
-                searchDialog.setMessage("Searching for DMX device.")
+                searchDialog!!.setMessage("Searching for DMX device.")
                 delay(250)
-                searchDialog.setMessage("Searching for DMX device..")
+                searchDialog!!.setMessage("Searching for DMX device..")
                 delay(250)
-                searchDialog.setMessage("Searching for DMX device...")
+                searchDialog!!.setMessage("Searching for DMX device...")
                 delay(250)
             }
             if (!RemoteDevice.getConnectionStatus()) {
-                searchDialog.setTitle("Alert")
-                searchDialog.setMessage(ListenerDaemon.message)
+                searchDialog!!.setTitle("Alert")
+                searchDialog!!.setMessage(ListenerDaemon.message)
                 delay(2000)
             }
-            searchDialog.dismiss()
+            searchDialog!!.dismiss()
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    override fun onDestroy() {
+        if(searchDialog != null && searchDialog!!.isShowing){
+            searchDialog!!.dismiss()
+        }
+        super.onDestroy()
+        Thread(ClientSendUDP(RemoteDevice.getRemoteIP(),
+                RemoteDevice.getRemotePort(),
+                Message.standby)).start()
     }
 
 }

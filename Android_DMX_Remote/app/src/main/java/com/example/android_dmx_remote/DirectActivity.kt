@@ -53,7 +53,7 @@ open class DirectActivity : AppCompatActivity() {
 
         button_addcue.setOnClickListener {
             Log.d("CLICK", "Add Cue")
-            val cuedialog = CreateCueDialog(this, ChannelHolder.levels)
+            val cuedialog = CreateCueDialog(this)
             cuedialog.show()
         }
 
@@ -244,9 +244,6 @@ open class DirectActivity : AppCompatActivity() {
         }
     }
 
-    private fun createCue(name: String) {
-        Log.d("DIALOG", "Create new cue")
-    }
 
     //Clear text from command line
     private fun textFlyOut() {
