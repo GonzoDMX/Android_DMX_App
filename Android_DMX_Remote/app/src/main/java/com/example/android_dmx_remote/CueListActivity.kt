@@ -59,7 +59,7 @@ open class CueListActivity : AppCompatActivity() {
         layoutManager = GridLayoutManager(this, 2)
         recycle_cuelist.layoutManager = layoutManager
 
-        adapter = RecyclerCueAdapter()
+        adapter = RecyclerCueAdapter(this)
         recycle_cuelist.adapter = adapter
 
         itemTouchHelper.attachToRecyclerView(recycle_cuelist)
@@ -166,15 +166,27 @@ open class CueListActivity : AppCompatActivity() {
             blackOut = false
             output.endBlackOut()
         }
+        (adapter as RecyclerCueAdapter).resetIndex()
         val intent = Intent(this, DirectActivity::class.java).apply {}
         startActivity(intent)
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
     }
 
-    override fun onResume() {
-        super.onResume()
+
+    fun cuePlay(new: Int, old: Int) {
+        if(new != old) {
+            (adapter as RecyclerCueAdapter).notifyItemChanged(new)
+            if (old >= 0) {
+                (adapter as RecyclerCueAdapter).notifyItemChanged(old)
+            }
+        }
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
         (adapter as RecyclerCueAdapter).notifyDataSetChanged()
     }
+
 
     //Catches event when user presses back button
     override fun onSupportNavigateUp(): Boolean {

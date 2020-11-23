@@ -9,40 +9,41 @@
         android:id="@+id/text_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Create New Cue"
+        android:text="Edit Cue"
         android:textSize="25dp"
         android:layout_marginTop="10dp"
-        app:layout_constraintBottom_toTopOf="@+id/edit_CueName"
+        app:layout_constraintBottom_toTopOf="@+id/edit_name_edit"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="@id/text_CueName"/>
+        app:layout_constraintLeft_toLeftOf="@id/text_name_edit"/>
+
 
     <EditText
-        android:id="@+id/edit_CueName"
+        android:id="@+id/edit_name_edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
         android:inputType="textPersonName"
         android:text="Cue Name"
         android:layout_marginRight="30dp"
-        app:layout_constraintBottom_toTopOf="@id/edit_FadeTime"
+        app:layout_constraintBottom_toTopOf="@id/edit_fade_edit"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/text_CueName" />
+        app:layout_constraintStart_toEndOf="@id/text_name_edit" />
 
 
     <TextView
-        android:id="@+id/text_CueName"
+        android:id="@+id/text_name_edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Cue Name:"
         android:layout_marginLeft="30dp"
         android:layout_marginRight="5dp"
-        app:layout_constraintBottom_toBottomOf="@+id/edit_CueName"
-        app:layout_constraintEnd_toStartOf="@id/edit_CueName"
-        app:layout_constraintTop_toTopOf="@+id/edit_CueName"
+        app:layout_constraintBottom_toBottomOf="@+id/edit_name_edit"
+        app:layout_constraintEnd_toStartOf="@id/edit_name_edit"
+        app:layout_constraintTop_toTopOf="@+id/edit_name_edit"
         app:layout_constraintStart_toStartOf="parent"/>
 
     <EditText
-        android:id="@+id/edit_FadeTime"
+        android:id="@+id/edit_fade_edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -52,39 +53,50 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/text_FadeTime"/>
+        app:layout_constraintStart_toEndOf="@id/text_fade_edit"/>
 
     <TextView
-        android:id="@+id/text_FadeTime"
+        android:id="@+id/text_fade_edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Fade Time:"
         android:layout_marginLeft="30dp"
         android:layout_marginRight="5dp"
-        app:layout_constraintBottom_toBottomOf="@+id/edit_FadeTime"
-        app:layout_constraintEnd_toStartOf="@id/edit_FadeTime"
-        app:layout_constraintTop_toTopOf="@+id/edit_FadeTime"
+        app:layout_constraintBottom_toBottomOf="@+id/edit_fade_edit"
+        app:layout_constraintEnd_toStartOf="@id/edit_fade_edit"
+        app:layout_constraintTop_toTopOf="@+id/edit_fade_edit"
         app:layout_constraintStart_toStartOf="parent"/>
 
     <Button
-        android:id="@+id/button_create"
+        android:id="@+id/button_commit_edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:text="Create"
-        app:layout_constraintBottom_toBottomOf="@+id/button_cancel"
+        android:text="Commit"
+        app:layout_constraintBottom_toBottomOf="@+id/button_cancel_edit"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/button_cancel"
-        app:layout_constraintTop_toTopOf="@+id/button_cancel" />
+        app:layout_constraintEnd_toStartOf="@id/button_delete_edit"
+        app:layout_constraintTop_toTopOf="@+id/button_cancel_edit" />
 
     <Button
-        android:id="@+id/button_cancel"
+        android:id="@+id/button_delete_edit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="Delete"
+        app:layout_constraintBottom_toBottomOf="@+id/button_cancel_edit"
+        app:layout_constraintStart_toEndOf="@id/button_commit_edit"
+        app:layout_constraintEnd_toStartOf="@id/button_cancel_edit"
+        app:layout_constraintTop_toTopOf="@+id/button_cancel_edit" />
+
+    <Button
+        android:id="@+id/button_cancel_edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:text="Cancel"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/button_create"
-        app:layout_constraintTop_toBottomOf="@id/edit_FadeTime" />
+        app:layout_constraintStart_toEndOf="@+id/button_delete_edit"
+        app:layout_constraintTop_toBottomOf="@id/edit_fade_edit" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -19,6 +19,39 @@
         android:layout_height="wrap_content"
         android:padding="8dp">
 
+        <ImageView
+            android:id="@+id/image_gocard"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:visibility="invisible"
+            android:layout_marginRight="10dp"
+            app:layout_constraintStart_toStartOf="@id/const_cardcue"
+            app:layout_constraintTop_toTopOf="@id/const_cardcue"
+            app:srcCompat="@android:drawable/ic_media_play"
+            app:tint="@color/moving_red" />
+
+        <ProgressBar
+            android:id="@+id/progress_fade"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:progressTint="@color/moving_red"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            app:layout_constraintStart_toEndOf="@id/image_gocard"
+            app:layout_constraintEnd_toStartOf="@id/image_editcard"
+            app:layout_constraintTop_toTopOf="@id/const_cardcue"/>
+
+        <ImageView
+            android:id="@+id/image_editcard"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:visibility="invisible"
+            android:layout_marginLeft="10dp"
+            app:layout_constraintEnd_toEndOf="@id/const_cardcue"
+            app:layout_constraintTop_toTopOf="@id/const_cardcue"
+            app:srcCompat="@android:drawable/ic_menu_edit"
+            app:tint="@color/moving_red"/>
 
         <TextView
             android:id="@+id/text_cuename"
@@ -26,18 +59,10 @@
             android:layout_height="wrap_content"
             android:text="Cue Name"
             android:textSize="30dp"
+            android:layout_marginTop="10dp"
             app:layout_constraintStart_toStartOf="@id/const_cardcue"
             app:layout_constraintEnd_toEndOf="@id/const_cardcue"
-            app:layout_constraintTop_toTopOf="@id/const_cardcue" />
-
-        <ImageView
-            android:id="@+id/image_card"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:visibility="invisible"
-            app:layout_constraintEnd_toEndOf="@id/const_cardcue"
-            app:layout_constraintTop_toTopOf="@id/const_cardcue"
-            app:srcCompat="@android:drawable/ic_menu_edit" />
+            app:layout_constraintTop_toTopOf="@id/progress_fade" />
 
         <TextView
             android:id="@+id/text_fadetitle"

@@ -13,7 +13,12 @@ object CueListMap {
         cueCount += 1
     }
 
-    fun getCue(cue: Int): CueClass? {
+    fun editCue(cue: CueClass, pos: Int) {
+        cues[pos]!!.name = cue.name
+        cues[pos]!!.fade = cue.fade
+    }
+
+    fun getCue(cue: Int): CueClass {
         return this.cues[cue]!!
     }
 
@@ -28,7 +33,7 @@ object CueListMap {
     fun getTimes(): ArrayList<String>{
         var times = ArrayList<String>()
         for(i in 0 until cueCount){
-            times.add(cues[i]!!.fade.toString())
+            times.add("%.1f".format(cues[i]!!.fade.toFloat() / 1000f) + " Sec")
         }
         return times
     }
@@ -82,6 +87,17 @@ object CueListMap {
         if(cueCount > 0) {
             for (i in 0 until cueCount) {
                 if (cues[i]!!.name == name) {
+                    return false
+                }
+            }
+        }
+        return true
+    }
+
+    fun nameEdit(name: String, pos: Int): Boolean {
+        if(cueCount > 0) {
+            for (i in 0 until cueCount) {
+                if (cues[i]!!.name == name && i != pos) {
                     return false
                 }
             }
