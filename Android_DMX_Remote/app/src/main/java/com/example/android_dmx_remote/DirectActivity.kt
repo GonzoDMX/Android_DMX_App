@@ -215,6 +215,7 @@ open class DirectActivity : AppCompatActivity() {
                     if (checkUserInput()) {
                         Log.d("OPERATION", "Transmit Command!")
                         val cueData = parseUserInput(cmdLineText)
+
                         //Check that cue is valid
                         if (cueData.validCue) {
                             //If cue is valid reset time button
@@ -412,6 +413,20 @@ open class DirectActivity : AppCompatActivity() {
                 (subParser[1].toFloat() * 1000).toInt()
             }
             else { 0 }
+
+/*          //Possible to pull CueClass from here
+            //Note: Channels and intensity separate will still be needed for updating tableView
+            var levelSet = ArrayList<Int>()
+            for (i in 0 until 512) {
+                if (channels.contains(i)) {
+                    levelSet.add(intensity)
+                } else {
+                    levelSet.add(0)
+                }
+            }
+            val commandCue = CueClass("COMMAND", levelSet, fadetime)
+*/
+
 
             //Returns a RawCue Data Class object for more efficient processing of cue data
             return RawCue(true, channels, intensity, fadetime)

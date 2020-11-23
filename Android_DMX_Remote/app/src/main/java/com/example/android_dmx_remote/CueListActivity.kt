@@ -175,6 +175,8 @@ open class CueListActivity : AppCompatActivity() {
 
     fun cuePlay(new: Int, old: Int) {
         if(new != old) {
+            //If no fade required
+            output.goCue(CueListMap.getCue(new))
             (adapter as RecyclerCueAdapter).notifyItemChanged(new)
             if (old >= 0) {
                 (adapter as RecyclerCueAdapter).notifyItemChanged(old)
