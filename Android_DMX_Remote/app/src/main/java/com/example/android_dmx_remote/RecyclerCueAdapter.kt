@@ -51,7 +51,20 @@ class RecyclerCueAdapter(cueListActivity: CueListActivity) : RecyclerView.Adapte
     }
 
     fun moveItem(from: Int, to: Int) {
-        CueListMap.moveCue(from, to)
+        if(oldPlayPosition == from) {
+            oldPlayPosition = to
+        } else {
+            if (from < to) {
+                if (oldPlayPosition in from..to) {
+                    oldPlayPosition -= 1
+                }
+            } else if (from > to) {
+                if (oldPlayPosition in to..from) {
+                    oldPlayPosition += 1
+                }
+            }
+        }
+        CueListMap.moveCue(activity, from, to)
     }
 
     fun editModeEnable(edit: Boolean) {
@@ -102,10 +115,6 @@ class RecyclerCueAdapter(cueListActivity: CueListActivity) : RecyclerView.Adapte
         }
     }
 
-    private fun convert(number: Int, original: IntRange, target: IntRange): Int {
-        val ratio = number.toFloat() / (original.last - original.first)
-        return (ratio * (target.last - target.first)).toInt()
-    }
 
     override fun getItemCount(): Int {
         Log.d("RECYCLE", CueListMap.getCueCount().toString())

@@ -3,12 +3,20 @@ package com.example.android_dmx_remote
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import java.lang.reflect.Type
+
 
 object PrefAccessOr {
 
     private val PREF_FILE = BuildConfig.APPLICATION_ID.replace(".", "_")
     private var sharedPreferences: SharedPreferences? = null
+
+    private val mapKey = "CUELIST"
+    private val countKey = "CUECOUNT"
 
     private fun openPref(context: Context) {
         sharedPreferences = context.getSharedPreferences(PREF_FILE, AppCompatActivity.MODE_PRIVATE)
@@ -24,10 +32,43 @@ object PrefAccessOr {
 
     fun setValue(context: Context, key: String, value: String) {
         openPref(context);
-        val prefsPrivateEditor = sharedPreferences!!.edit()
-        prefsPrivateEditor.putString(key, value)
-        prefsPrivateEditor.apply()
+        val editor = sharedPreferences!!.edit()
+        editor.putString(key, value)
+        editor.apply()
+        sharedPreferences = null
+    }
+
+    fun saveCueListMap(context: Context, cueMap: MutableMap<Int, CueClass>, cueCount: Int){
+        openPref(context)
+        val jsonObject = Gson().toJson(cueMap as Map<Int, Any>)
+        //val jsonString = jsonObject.toString()
+        val editor: SharedPreferences.Editor = sharedPreferences!!.edit()
+        editor.remove(mapKey).apply()
+        editor.remove(countKey).apply()
+        editor.putString(mapKey, jsonObject)
+        editor.putInt(countKey, cueCount)
+        editor.commit()
+    }
+
+    fun recoverCueListMap(context: Context) {
+        openPref(context)
+        val mapString = sharedPreferences!!.getString(mapKey, "")
+        Log.d("PRINT", mapString.toString())
+        if (mapString != "") {
+            val count = sharedPreferences!!.getInt(countKey, 0)
+            Log.d("COUNT", count.toString())
+            var map: MutableMap<Int, CueClass> = HashMap()
+            //TODO: Problem here does not properly reconstruct Map Data
+
+            val typeOfHashMap: Type = object : TypeToken<Map<Int, CueClass>?>() {}.type
+            map = Gson().fromJson(mapString, typeOfHashMap)
+            Log.d("MAPMAP", map.toString())
+            CueListMap.setMap(count, map)
+        } else {
+            Log.d("LOAD", "No Cue List Map Found")
+        }
         sharedPreferences = null
     }
 
 }
+

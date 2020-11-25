@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.Window
-import com.example.android_dmx_remote.Canaux.levels
 import kotlinx.android.synthetic.main.create_cue_dialog.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -16,8 +15,9 @@ import kotlinx.coroutines.launch
 
 
 class CreateCueDialog
-(var c: Activity) : Dialog(c), View.OnClickListener {
+(var c: Activity, levels: ArrayList<Int>) : Dialog(c), View.OnClickListener {
 
+    private val cueLevels = levels
     private val fadeCheck = Regex("^([0-9]|[1-9][0-9])(|[,.][0-9])$")
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,13 +31,13 @@ class CreateCueDialog
     override fun onClick(v: View) {
         when (v.id) {
             R.id.button_create -> {
-
                 if(fadeCheck.matches(edit_FadeTime.text.toString())) {
                     val name = edit_CueName.text.toString()
                     val fade = (edit_FadeTime.text.toString().toFloat() * 1000).toInt()
                     if(CueListMap.nameFree(name)) {
-                        var cue = CueClass(name, levels, fade)
-                        CueListMap.addCue(cue)
+                        Log.d("CHANNEL_CHECK", cueLevels.toString())
+                        var cue = CueClass(name, cueLevels, fade)
+                        CueListMap.addCue(c, cue)
                         Log.d("CUELIST", "CUE CREATED!")
                         dismiss()
                     } else {

@@ -45,7 +45,7 @@ class EditCueDialog
                     val fade = (edit_fade_edit.text.toString().toFloat() * 1000).toInt()
                     if(CueListMap.nameEdit(name, position)) {
                         var cue = CueClass(name, levels, fade)
-                        CueListMap.editCue(cue, position)
+                        CueListMap.editCue(c, cue, position)
                         Log.d("CUELIST", "CUE CREATED!")
                         dismiss()
                     } else {
@@ -57,7 +57,7 @@ class EditCueDialog
             }
             R.id.button_delete_edit -> {
                 Log.d("TEST", "Delete: $position")
-                CueListMap.deleteCue(position)
+                CueListMap.deleteCue(c, position)
                 dismiss()
             }
             R.id.button_cancel_edit -> dismiss()

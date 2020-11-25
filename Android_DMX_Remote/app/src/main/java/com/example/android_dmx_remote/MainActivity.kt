@@ -123,7 +123,7 @@ class MainActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onResume() {
         super.onResume()
-        setConnection()
+        //setConnection()
     }
 
 
@@ -175,16 +175,21 @@ class MainActivity : AppCompatActivity() {
                         ThreadReturn.message == "</DEJA_VU>") {
                     Log.d("THREADMAIN", "RETURN CONNECTED")
                     RemoteDevice.setConnectionStatus(true)
+                    RemoteDevice.setAlertStatus(true)
                     button_online.compoundDrawableTintList = ColorStateList.valueOf(Color.GREEN)
                 } else if (ThreadReturn.message == "</WAKE_UP>") {
                     Log.d("THREADMAIN", "WAKE UP")
                     RemoteDevice.setConnectionStatus(true)
+                    RemoteDevice.setAlertStatus(true)
                     button_online.compoundDrawableTintList = ColorStateList.valueOf(Color.GREEN)
                 } else if (ThreadReturn.message == "</BRAKMOD>") {
                     Log.d("THREADMAIN", "Break Mode")
                     RemoteDevice.setConnectionStatus(true)
+                    RemoteDevice.setAlertStatus(true)
                     button_online.compoundDrawableTintList = ColorStateList.valueOf(Color.GREEN)
                 } else if (ThreadReturn.message == "</STANDBY>") {
+                    RemoteDevice.setConnectionStatus(true)
+                    RemoteDevice.setAlertStatus(true)
                     wakeDialog()
                 } else {
                     Log.d("THREADMAIN", "INVALID RETURN")
@@ -193,11 +198,13 @@ class MainActivity : AppCompatActivity() {
                         ListenerDaemon.message = "Invalid response from device: " + ThreadReturn.message
                         RemoteDevice.setConnectionStatus(false)
                         RemoteDevice.setAlertStatus(true)
+                        button_online.compoundDrawableTintList = ColorStateList.valueOf(Color.RED)
                     } else {
                         errorDialog("Invalid response from device: " + ThreadReturn.message)
                         RemoteDevice.setConnectionStatus(false)
+                        RemoteDevice.setAlertStatus(true)
+                        button_online.compoundDrawableTintList = ColorStateList.valueOf(Color.RED)
                     }
-                    button_online.compoundDrawableTintList = ColorStateList.valueOf(Color.RED)
                 }
             } else {
                 Log.d("THREADMAIN", "RETURN TIMEOUT")
@@ -238,6 +245,7 @@ class MainActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.M)
     private fun wakeDialog() {
         val alertDialog = AlertDialog.Builder(this@MainActivity).create()
+        alertDialog.setCancelable(false)
         alertDialog.setTitle("Alert")
         alertDialog.setMessage("ESP32 on Standby, press Wake to restore channel" +
                 "levels from ESP32 or press Reset to set all levels to zero")

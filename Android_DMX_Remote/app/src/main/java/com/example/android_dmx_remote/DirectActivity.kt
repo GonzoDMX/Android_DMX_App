@@ -29,6 +29,8 @@ import kotlinx.coroutines.launch
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 open class DirectActivity : AppCompatActivity() {
 
+    private val output = OutputManager()
+
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,7 +55,7 @@ open class DirectActivity : AppCompatActivity() {
 
         button_addcue.setOnClickListener {
             Log.d("CLICK", "Add Cue")
-            val cuedialog = CreateCueDialog(this)
+            val cuedialog = CreateCueDialog(this, Canaux.levels)
             cuedialog.show()
         }
 
@@ -215,7 +217,6 @@ open class DirectActivity : AppCompatActivity() {
                     if (checkUserInput()) {
                         Log.d("OPERATION", "Transmit Command!")
                         val cueData = parseUserInput(cmdLineText)
-
                         //Check that cue is valid
                         if (cueData.validCue) {
                             //If cue is valid reset time button
@@ -229,7 +230,12 @@ open class DirectActivity : AppCompatActivity() {
                             } else {
                                 flashGreen()
                             }
+                            val cueclass = parseCueClass(cueData)
+                            if (cueclass != null) {
+                                output.goCue(cueclass)
+                            }
                             setChannelValues(cueData)
+
                         }
                         //Else if cue is invalid signal the error
                         else {
@@ -279,20 +285,6 @@ open class DirectActivity : AppCompatActivity() {
             val countDown = cue.fadeTime!!
             if (countDown == 0) {
                 updateChildDMX(cue.chanSelect!!, cue.intensityVal!!, false)
-                var index = 0
-                cue.chanSelect.forEach { channel -> Canaux.levels[channel - 1] = cue.intensityVal
-                    index += 1
-                }
-                //If connected to ESP32 Broadcast Channel Values
-                if(RemoteDevice.getConnectionStatus()) {
-                    Thread(
-                            ClientChannelsUDP(
-                                    RemoteDevice.getRemoteIP(),
-                                    RemoteDevice.getRemotePort(),
-                                    Canaux.levels
-                            )
-                    ).start()
-                }
             }
             else {
                 button_enter.isEnabled = false
@@ -396,6 +388,29 @@ open class DirectActivity : AppCompatActivity() {
     }
 
 
+    private fun parseCueClass(raw: RawCue): CueClass? {
+        if(raw.validCue) {
+            //Possible to pull CueClass from here
+            //Note: Channels and intensity separate will still be needed for updating tableView
+            val intensity = raw.intensityVal
+            val channels = raw.chanSelect
+            var fadetime = raw.fadeTime
+            var levelSet = ArrayList<Int>()
+            for (i in 0 until 512) {
+                if (channels!!.contains(i + 1)) {
+                    levelSet.add(intensity!!)
+                } else {
+                    levelSet.add(Canaux.levels[i])
+                }
+            }
+            if (fadetime == null) {
+                fadetime = 0
+            }
+            return CueClass("REMOTE", levelSet, fadetime)
+        }
+        return null
+    }
+
     //Splits cmd line data and Parses out Intensity Value and Fade Time Value
     private fun parseUserInput(cmdInput: String): RawCue {
 
@@ -413,20 +428,6 @@ open class DirectActivity : AppCompatActivity() {
                 (subParser[1].toFloat() * 1000).toInt()
             }
             else { 0 }
-
-/*          //Possible to pull CueClass from here
-            //Note: Channels and intensity separate will still be needed for updating tableView
-            var levelSet = ArrayList<Int>()
-            for (i in 0 until 512) {
-                if (channels.contains(i)) {
-                    levelSet.add(intensity)
-                } else {
-                    levelSet.add(0)
-                }
-            }
-            val commandCue = CueClass("COMMAND", levelSet, fadetime)
-*/
-
 
             //Returns a RawCue Data Class object for more efficient processing of cue data
             return RawCue(true, channels, intensity, fadetime)
