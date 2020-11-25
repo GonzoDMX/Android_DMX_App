@@ -94,10 +94,10 @@ class RecyclerCueAdapter(cueListActivity: CueListActivity) : RecyclerView.Adapte
 
         //Set flag for currently active cue
         if(position == playPosition) {
-
             holder.playImage.visibility = VISIBLE
             if (playTime > 0) {
                 GlobalScope.launch(context = Dispatchers.Main) {
+                    activity.toggleEdit(false)
                     var prog = 0
                     while (prog < playTime) {
                         holder.playProgress.progress = ((prog.toFloat() * 100f) / playTime.toFloat()).toInt()
@@ -105,6 +105,8 @@ class RecyclerCueAdapter(cueListActivity: CueListActivity) : RecyclerView.Adapte
                         prog += 40
                     }
                     holder.playProgress.progress = 100
+                    playTime = 0
+                    activity.toggleEdit(true)
                 }
             } else {
                 holder.playProgress.progress = 100

@@ -85,6 +85,7 @@ open class CueListActivity : AppCompatActivity() {
 
         button_remote.setOnClickListener {
             Log.d("CLICK", "DMX REMOTE")
+            output.cancel()
             goToDirect()
         }
 
@@ -100,7 +101,11 @@ open class CueListActivity : AppCompatActivity() {
                 editMode = true
                 (adapter as RecyclerCueAdapter).editModeEnable(editMode)
             }
-            (adapter as RecyclerCueAdapter).notifyDataSetChanged()
+            if(CueListMap.getCueCount() > 0) {
+                for (i in 0 until CueListMap.getCueCount()) {
+                    (adapter as RecyclerCueAdapter).notifyItemChanged(i)
+                }
+            }
         }
 
         button_blackout.setOnClickListener {
@@ -117,6 +122,9 @@ open class CueListActivity : AppCompatActivity() {
 
     }
 
+    fun toggleEdit(edit: Boolean) {
+        button_edit.isEnabled = edit
+    }
 
     private val itemTouchHelper by lazy {
         // 1. Note that I am specifying all 4 directions.
@@ -200,6 +208,7 @@ open class CueListActivity : AppCompatActivity() {
     //Slide Out slide in animation for going back to main activity
     override fun finish() {
         super.finish()
+        output.cancel()
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
     }
 }

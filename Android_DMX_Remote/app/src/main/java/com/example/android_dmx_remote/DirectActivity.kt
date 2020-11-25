@@ -6,7 +6,9 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.GestureDetector
 import android.view.Gravity
+import android.view.MotionEvent
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -208,6 +210,17 @@ open class DirectActivity : AppCompatActivity() {
                 }
             }
 
+            button_del.setOnLongClickListener {
+                text_cmdline.setText("")
+                checkUserInput()
+                if(timeSet) {
+                    timeSet = false
+                    button_time.text = getString(R.string.time)
+                }
+                true
+            }
+
+
             button_enter.setOnClickListener {
                 if (text_cmdline.text.toString() == "") {
                     flashError()
@@ -246,6 +259,7 @@ open class DirectActivity : AppCompatActivity() {
             }
         }
     }
+
 
 
     //Clear text from command line
@@ -358,7 +372,8 @@ open class DirectActivity : AppCompatActivity() {
 
     //Processes cmd line input through Regex to validate input
     private fun checkUserInput(): Boolean {
-        return if (cmdLineCheck(text_cmdline.text.toString())){
+        val strText = text_cmdline.text.toString()
+        return if (cmdLineCheck(strText) || strText == ""){
             progress_time.progress = 0
             true
         }

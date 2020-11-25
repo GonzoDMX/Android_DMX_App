@@ -34,6 +34,14 @@ class OutputManager {
     }
 
     private fun setLevels(cueLevels: ArrayList<Int>, modLevels: ArrayList<Int>) {
+        //Check if coroutine fade is running, if so kill it
+        if(job != null) {
+            //Block here to wait until running job is cancelled
+            while (job!!.isActive) {
+                Log.d("JOB", "Cancelling")
+                job!!.cancel()
+            }
+        }
         Canaux.levels = cueLevels
         if (!blackout) {
             transmit(modLevels)
@@ -82,6 +90,7 @@ class OutputManager {
                         }
                     }
                     transmit(current)
+                    Canaux.levels = current
                     val loopEnd = System.currentTimeMillis()
                     count += (30 + (loopEnd - loopStart).toInt())
                     delay(30)
@@ -130,6 +139,12 @@ class OutputManager {
         }
         if (!blackout) {
             transmit(masterLevels)
+        }
+    }
+
+    fun cancel() {
+        if(job != null) {
+            job!!.cancel()
         }
     }
 }
