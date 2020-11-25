@@ -10,7 +10,7 @@ class OutputManager {
     private var cueLevels = ArrayList<Int>()
     private var masterLevels = ArrayList<Int>()
 
-    private var master = 100.0f
+    private var master = 1.0f
     private var blackout = false
 
     private var job: CoroutineContext? = null
@@ -24,13 +24,11 @@ class OutputManager {
         cueLevels = cue.levels
         var modLevels = ArrayList<Int>()
         for(i in 0 until 512){
-            modLevels.add((cue.levels[i].toFloat() * (this.master / 100f)).toInt())
+            modLevels.add((cue.levels[i].toFloat() * master).toInt())
         }
         if(cue.fade == 0) {
-            Log.d("GO_CUE", "Set Levels")
             setLevels(cueLevels, modLevels)
         } else {
-            Log.d("GO_CUE", "Fade Levels")
             fadeLevels(cueLevels, modLevels, cue.fade)
         }
     }
@@ -53,36 +51,43 @@ class OutputManager {
             }
         }
         job = GlobalScope.launch(context = Dispatchers.Main) {
-            var currentMaster = ArrayList<Int>()
+            //Holds initial values
+            val init = ArrayList<Int>()
+            //Holds current state values
+            var current = ArrayList<Int>()
+            for (level in Canaux.levels) {
+                init.add((level * master).toInt())
+                current.add((level * master).toInt())
+            }
+            //Holds fade target values
+            val targ = modLevels
 
-            var current = if(master < 100.0f) { masterLevels } else {Canaux.levels}
-            var target = modLevels
-            var fade = cueFade
+            //Start fade count at 0
+            var count = 0
             //While isActive needed to make to coroutine cancellable
             while(isActive) {
-                while(fade >= 0) {
+                while(count <= cueFade) {
                     val loopStart = System.currentTimeMillis()
                     for (i in 0 until 512) {
-                        if (target[i] != current[i]) {
+                        if (init[i] != targ[i]) {
                             //if fading down
-                            current[i] = if(target[i] > Canaux.levels[i]) {
-                                val count = (cueFade - (cueFade - fade))
-                                MathAPO.mapRange(count, 0, cueFade, target[i], Canaux.levels[i])
+                            if(init[i] > targ[i]) {
+                                val deCount = cueFade - count
+                                current[i] = MathAPO.mapRange(deCount, 0, cueFade, targ[i], init[i])
                             }
                             //Else fade up
                             else {
-                                val count = (cueFade - fade)
-                                MathAPO.mapRange(count, 0, cueFade, Canaux.levels[i], target[i])
+                                current[i] = MathAPO.mapRange(count, 0, cueFade, init[i], targ[i])
                             }
                         }
                     }
                     transmit(current)
                     val loopEnd = System.currentTimeMillis()
-                    fade -= (30 + (loopEnd - loopStart).toInt())
+                    count += (30 + (loopEnd - loopStart).toInt())
                     delay(30)
                 }
                 Canaux.levels = cueLevels
-                transmit(target)
+                transmit(targ)
                 job!!.cancel()
             }
             Log.d("JOB", "Finished")
@@ -111,17 +116,17 @@ class OutputManager {
 
     fun endBlackOut() {
         for(i in 0 until 512){
-            masterLevels[i] = ((Canaux.levels[i].toFloat() * (this.master / 100f)).toInt())
+            masterLevels[i] = ((Canaux.levels[i].toFloat() * master).toInt())
         }
         transmit(masterLevels)
         blackout = false
     }
 
 
-    fun setMaster(master: Float){
-        this.master = master
+    fun setMaster(value: Float){
+        this.master = value / 100
         for(i in 0 until 512){
-            masterLevels[i] = ((Canaux.levels[i].toFloat() * (this.master / 100f)).toInt())
+            masterLevels[i] = ((Canaux.levels[i].toFloat() * master).toInt())
         }
         if (!blackout) {
             transmit(masterLevels)

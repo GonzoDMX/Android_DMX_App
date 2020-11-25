@@ -218,24 +218,20 @@ open class DirectActivity : AppCompatActivity() {
                         Log.d("OPERATION", "Transmit Command!")
                         val cueData = parseUserInput(cmdLineText)
                         //Check that cue is valid
-                        if (cueData.validCue) {
+                        if (cueData != null) {
                             //If cue is valid reset time button
                             timeSet = false
                             button_time.text = getString(R.string.time)
                             //Animate Clear Text
                             textFlyOut()
                             //Check if fade and set progress bar accordingly
-                            if (cueData.fadeTime!! > 0) {
-                                progressCount(cueData.fadeTime)
+                            if (cueData.fade > 0) {
+                                progressCount(cueData.fade)
                             } else {
                                 flashGreen()
                             }
-                            val cueclass = parseCueClass(cueData)
-                            if (cueclass != null) {
-                                output.goCue(cueclass)
-                            }
+                            output.goCue(cueData)
                             setChannelValues(cueData)
-
                         }
                         //Else if cue is invalid signal the error
                         else {
@@ -268,84 +264,69 @@ open class DirectActivity : AppCompatActivity() {
             progress_time.progressTintList = ColorStateList.valueOf(Color.GREEN)
             progress_time.progress = 0
             var x = 0
-            while (x <= 100) {
-                progress_time.progress = x
-                delay((time / 100).toLong())
-                x += 1
+            while (x < time) {
+                progress_time.progress = ((x.toFloat() * 100f) / time.toFloat()).toInt()
+                delay(30)
+                x += 30
             }
-            delay(10)
+            progress_time.progress = 100
+            delay(250)
             progress_time.progress = 0
             progress_time.progressTintList = ColorStateList.valueOf(Color.RED)
         }
     }
 
-    private fun setChannelValues(cue: RawCue){
+    private fun setChannelValues(cue: CueClass){
         //Non-Blocking Coroutine for updating channel values
         GlobalScope.launch(context = Dispatchers.Main) {
-            val countDown = cue.fadeTime!!
-            if (countDown == 0) {
-                updateChildDMX(cue.chanSelect!!, cue.intensityVal!!, false)
+
+            if (cue.fade == 0) {
+                //updateChildDMX(cue.chanSelect!!, cue.intensityVal!!, false)
+                updateTableDMX(cue.levels, cue.fade)
             }
             else {
                 button_enter.isEnabled = false
-                var count = countDown
-                var incIntense: Int
-                val maxChannel = cue.chanSelect?.maxOrNull() ?: 0
-                var pushArray = ArrayList<Int>()
-                for (i in 0 until maxChannel){
-                    pushArray.add(Canaux.levels[i])
+
+                //Holds initial values
+                val init = ArrayList<Int>()
+                //Holds current state values
+                val current = ArrayList<Int>()
+                //Disassociate init and current from Canaux
+                for (level in Canaux.levels){
+                    init.add(level)
+                    current.add(level)
                 }
-                while(count >= 0) {
+                //Holds fade target values
+                val targ = ArrayList<Int>()
+                for (level in cue.levels) {
+                    targ.add(level)
+                }
+                //Start fade count at 0
+                var count = 0
+                //Holds fade value Int in millis
+                val fade = cue.fade
+                while(count <= fade) {
                     val loopStart = System.currentTimeMillis()
-                    val tempList = ArrayList<Int>()
-                    tempList.add(0)
-                    for (channel in cue.chanSelect!!){
-                        val init = Canaux.levels[channel - 1]
-                        val targ = cue.intensityVal!!
-                        if (init != targ) {
-                            tempList[0] = channel
+                    for(i in 0 until 512) {
+                        if (init[i] != targ[i]) {
                             //Set direction of fade ie: if Init > Targ -> fade down
-                            incIntense = if (init > targ) {
-                                val decVal = (countDown - (countDown - count))
-                                mapRange(decVal, 0, countDown, targ, init)
+                            if (init[i] > targ[i]) {
+                                val deCount = fade - count
+                                current[i] = mapRange(deCount, 0, fade, targ[i], init[i])
                             }
                             //Else fade up
                             else {
-                                val decVal = (countDown - count)
-                                mapRange(decVal, 0, countDown, init, targ)
+                                current[i] = mapRange(count, 0, fade, init[i], targ[i])
                             }
-                            pushArray[channel - 1] = incIntense
-                            updateChildDMX(tempList, incIntense, true)
                         }
                     }
-                    //If connected to ESP32 Broadcast Channel Values
-                    if(RemoteDevice.getConnectionStatus()) {
-                        Thread(
-                                ClientChannelsUDP(
-                                        RemoteDevice.getRemoteIP(),
-                                        RemoteDevice.getRemotePort(), pushArray
-                                )
-                        ).start()
-                    }
+                    updateTableDMX(current, fade - count)
                     val loopEnd = System.currentTimeMillis()
-                    count -= (30 + (loopEnd - loopStart).toInt())
+                    count += (30 + (loopEnd - loopStart).toInt())
                     delay(30)
                 }
-                updateChildDMX(cue.chanSelect!!, cue.intensityVal!!, false)
-                for(channel in cue.chanSelect) {
-                    Canaux.levels[channel - 1] = cue.intensityVal
-                    pushArray[channel - 1] = cue.intensityVal
-                }
-                //If connected to ESP32 Broadcast Channel Values
-                if(RemoteDevice.getConnectionStatus()) {
-                    Thread(
-                            ClientChannelsUDP(
-                                    RemoteDevice.getRemoteIP(),
-                                    RemoteDevice.getRemotePort(),
-                                    pushArray
-                            )
-                    ).start()
-                }
+                //Ensure values arrive at target
+                updateTableDMX(targ, 0)
                 button_enter.isEnabled = true
             }
         }
@@ -388,31 +369,8 @@ open class DirectActivity : AppCompatActivity() {
     }
 
 
-    private fun parseCueClass(raw: RawCue): CueClass? {
-        if(raw.validCue) {
-            //Possible to pull CueClass from here
-            //Note: Channels and intensity separate will still be needed for updating tableView
-            val intensity = raw.intensityVal
-            val channels = raw.chanSelect
-            var fadetime = raw.fadeTime
-            var levelSet = ArrayList<Int>()
-            for (i in 0 until 512) {
-                if (channels!!.contains(i + 1)) {
-                    levelSet.add(intensity!!)
-                } else {
-                    levelSet.add(Canaux.levels[i])
-                }
-            }
-            if (fadetime == null) {
-                fadetime = 0
-            }
-            return CueClass("REMOTE", levelSet, fadetime)
-        }
-        return null
-    }
-
     //Splits cmd line data and Parses out Intensity Value and Fade Time Value
-    private fun parseUserInput(cmdInput: String): RawCue {
+    private fun parseUserInput(cmdInput: String): CueClass? {
 
         if (cmdInput.contains("@") && cmdInput.takeLast(1) != "@") {
             val mainParser = cmdInput.split("@")
@@ -429,11 +387,18 @@ open class DirectActivity : AppCompatActivity() {
             }
             else { 0 }
 
-            //Returns a RawCue Data Class object for more efficient processing of cue data
-            return RawCue(true, channels, intensity, fadetime)
+            var levelSet = ArrayList<Int>()
+            for (i in 0 until 512) {
+                if (channels!!.contains(i + 1)) {
+                    levelSet.add(intensity!!)
+                } else {
+                    levelSet.add(Canaux.levels[i])
+                }
+            }
+            return CueClass("REMOTE", levelSet, fadetime)
         }
         else {
-            return RawCue(false, null, null, null)
+            return null
         }
     }
 
@@ -605,40 +570,48 @@ open class DirectActivity : AppCompatActivity() {
         }
     }
 
-    //Updates channel value on the channel matrix display
-    private fun updateChildDMX(channels: ArrayList<Int>, intensity: Int, fading: Boolean) {
 
-        for (index in IntRange(0, channels.count() - 1)) {
-            val chan = channels[index]
-            val rowVal = chan % 10
-            var col: Int
-            if (chan > 10) {
-                col = ((chan - rowVal) / 10)
-                if (rowVal == 0){
-                    col -= 1
+    //Updates channel value on the channel matrix display
+    private fun updateTableDMX(channels: ArrayList<Int>, fading: Int) {
+        GlobalScope.launch(context = Dispatchers.Main) {
+            for (i in 0 until channels.count()) {
+                val chan = i + 1
+                val intensity = channels[i]
+                val rowVal = chan % 10
+                var col: Int
+                if (chan > 10) {
+                    col = ((chan - rowVal) / 10)
+                    if (rowVal == 0) {
+                        col -= 1
+                    }
+                } else {
+                    col = 0
                 }
-            }
-            else{
-                col = 0
-            }
-            var textView = row_1.getChildAt(col) as TextView
-            when (rowVal) {
-                2 -> textView = row_2.getChildAt(col) as TextView
-                3 -> textView = row_3.getChildAt(col) as TextView
-                4 -> textView = row_4.getChildAt(col) as TextView
-                5 -> textView = row_5.getChildAt(col) as TextView
-                6 -> textView = row_6.getChildAt(col) as TextView
-                7 -> textView = row_7.getChildAt(col) as TextView
-                8 -> textView = row_8.getChildAt(col) as TextView
-                9 -> textView = row_9.getChildAt(col) as TextView
-                0 -> textView = row_10.getChildAt(col) as TextView
-            }
-            textView.text = intensity.toString()
-            //Set color of text blue = 0, Red when fading, Green when arrived at value > 0
-            when {
-                intensity == 0 -> { textView.setTextColor(ContextCompat.getColor(textView.context, R.color.stop_blue)) }
-                fading -> { textView.setTextColor(ContextCompat.getColor(textView.context, R.color.moving_red)) }
-                else -> { textView.setTextColor(ContextCompat.getColor(textView.context, R.color.dark_android_green)) }
+                var textView = row_1.getChildAt(col) as TextView
+                when (rowVal) {
+                    2 -> textView = row_2.getChildAt(col) as TextView
+                    3 -> textView = row_3.getChildAt(col) as TextView
+                    4 -> textView = row_4.getChildAt(col) as TextView
+                    5 -> textView = row_5.getChildAt(col) as TextView
+                    6 -> textView = row_6.getChildAt(col) as TextView
+                    7 -> textView = row_7.getChildAt(col) as TextView
+                    8 -> textView = row_8.getChildAt(col) as TextView
+                    9 -> textView = row_9.getChildAt(col) as TextView
+                    0 -> textView = row_10.getChildAt(col) as TextView
+                }
+                textView.text = intensity.toString()
+                //Set color of text blue = 0, Red when fading, Green when arrived at value > 0
+                when {
+                    intensity == 0 -> {
+                        textView.setTextColor(ContextCompat.getColor(textView.context, R.color.stop_blue))
+                    }
+                    fading > 0 -> {
+                        textView.setTextColor(ContextCompat.getColor(textView.context, R.color.moving_red))
+                    }
+                    else -> {
+                        textView.setTextColor(ContextCompat.getColor(textView.context, R.color.dark_android_green))
+                    }
+                }
             }
         }
     }

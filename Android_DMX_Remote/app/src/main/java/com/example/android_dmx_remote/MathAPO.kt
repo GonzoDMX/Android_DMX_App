@@ -6,5 +6,4 @@ object MathAPO {
     fun mapRange(num: Int, inMin: Int, inMax: Int, outMin: Int, outMax: Int): Int {
         return ((num - inMin) * (outMax - outMin) / (inMax - inMin) + outMin)
     }
-
 }
