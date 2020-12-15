@@ -1,6 +1,8 @@
 # Android_DMX_App
 An Android-based DMX Lighting Controller
 
+Created by: Andrew O'Shei
+
 ![](Images/APO_ANDROID_image1.jpg)
 
 ![](Images/APO_ANDROID_image2.jpg)
