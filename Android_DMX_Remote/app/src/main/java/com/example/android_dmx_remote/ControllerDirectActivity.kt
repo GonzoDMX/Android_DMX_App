@@ -292,7 +292,7 @@ open class ControllerDirectActivity : AppCompatActivity() {
 
             if (cue.fade == 0) {
                 //updateChildDMX(cue.chanSelect!!, cue.intensityVal!!, false)
-                updateTableDMX(cue.levels, cue.fade)
+                updateTableDMX(cue.levels, cue.fade, ModelChannelArray.levels)
             }
             else {
                 button_enter.isEnabled = false
@@ -330,13 +330,13 @@ open class ControllerDirectActivity : AppCompatActivity() {
                             }
                         }
                     }
-                    updateTableDMX(current, fade - count)
+                    updateTableDMX(current, fade - count, targ)
                     val loopEnd = System.currentTimeMillis()
                     count += (30 + (loopEnd - loopStart).toInt())
                     delay(30)
                 }
                 //Ensure values arrive at target
-                updateTableDMX(targ, 0)
+                updateTableDMX(targ, 0, targ)
                 button_enter.isEnabled = true
             }
         }
@@ -583,8 +583,9 @@ open class ControllerDirectActivity : AppCompatActivity() {
 
 
     //Updates channel value on the channel matrix display
-    private fun updateTableDMX(channels: ArrayList<Int>, fading: Int) {
+    private fun updateTableDMX(channels: ArrayList<Int>, fading: Int, target: ArrayList<Int>) {
         GlobalScope.launch(context = Dispatchers.Main) {
+            //Loop through all channel values and find position in grid table
             for (i in 0 until channels.count()) {
                 val chan = i + 1
                 val intensity = channels[i]
@@ -598,6 +599,7 @@ open class ControllerDirectActivity : AppCompatActivity() {
                 } else {
                     col = 0
                 }
+                //Get the TableLayout TextView child that corresponds with channel value
                 var textView = row_1.getChildAt(col) as TextView
                 when (rowVal) {
                     2 -> textView = row_2.getChildAt(col) as TextView
@@ -616,7 +618,7 @@ open class ControllerDirectActivity : AppCompatActivity() {
                     intensity == 0 -> {
                         textView.setTextColor(ContextCompat.getColor(textView.context, R.color.stop_blue))
                     }
-                    fading > 0 -> {
+                    fading > 0 && intensity != target[i] -> {
                         textView.setTextColor(ContextCompat.getColor(textView.context, R.color.moving_red))
                     }
                     else -> {
