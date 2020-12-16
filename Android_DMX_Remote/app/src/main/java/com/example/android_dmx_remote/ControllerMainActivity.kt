@@ -117,8 +117,8 @@ class ControllerMainActivity : AppCompatActivity() {
 
         button_settings.setOnClickListener {
             Log.d("CLICK", "SETTINGS")
-            val set_dialog = ControllerSettingsDialog(this)
-            set_dialog.show()
+            val settingsDialog = ControllerSettingsDialog(this)
+            settingsDialog.show()
         }
 
     }
@@ -172,6 +172,7 @@ class ControllerMainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun verifyConnect() {
+        //Validate the connection with ESP32 and signal result to user
         GlobalScope.launch(context = Dispatchers.Main) {
             var timeout = false
             var countdown = 30
@@ -184,8 +185,10 @@ class ControllerMainActivity : AppCompatActivity() {
                 }
             }
             if (!timeout) {
+                //Set dialog and Online indicator based on return message from ESP32
                 if (ModelThreadReturn.message == "</INITIAL>" ||
-                        ModelThreadReturn.message == "</DEJA_VU>") {
+                        ModelThreadReturn.message == "</DEJA_VU>" ||
+                        ModelThreadReturn.message == "</512>") {
                     Log.d("THREADMAIN", "RETURN CONNECTED")
                     ModelRemoteInfo.setConnectionStatus(true)
                     ModelRemoteInfo.setAlertStatus(true)
@@ -286,6 +289,7 @@ class ControllerMainActivity : AppCompatActivity() {
 
 
     private suspend fun searchDialog() {
+        //Creates Blocking dialog while app is searching network for ESP32
         Log.d("DIALOG", "Search is called")
         searchDialog = AlertDialog.Builder(this@ControllerMainActivity).create()
         searchDialog!!.setTitle("Hold on a minute")
@@ -317,6 +321,7 @@ class ControllerMainActivity : AppCompatActivity() {
             searchDialog!!.dismiss()
         }
         super.onDestroy()
+        //When App is closed put the ESP32 into standby mode
         Thread(ModelClientOutput(ModelRemoteInfo.getRemoteIP(),
                 ModelRemoteInfo.getRemotePort(),
                 ModelMessages.standby)).start()
