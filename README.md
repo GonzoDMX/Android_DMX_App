@@ -1,4 +1,4 @@
-# Android_DMX_App
+# Android DMX Remote
 An Android-based DMX Lighting Controller
 
 Created by: Andrew O'Shei
