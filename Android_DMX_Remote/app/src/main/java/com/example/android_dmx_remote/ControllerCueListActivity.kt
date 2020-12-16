@@ -16,12 +16,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.slider.Slider
 import kotlinx.android.synthetic.main.activity_cue_list.*
 
-open class CueListActivity : AppCompatActivity() {
+open class ControllerCueListActivity : AppCompatActivity() {
 
     private var layoutManager:RecyclerView.LayoutManager? = null
-    private var adapter:RecyclerView.Adapter<RecyclerCueAdapter.ViewHolder>? = null
+    private var adapter:RecyclerView.Adapter<ModelRecyclerCueAdapter.ViewHolder>? = null
 
-    private val output = OutputManager()
+    private val output = ModelOutputManager()
 
     private var editMode = false
     private var blackOut = false
@@ -32,7 +32,7 @@ open class CueListActivity : AppCompatActivity() {
         setContentView(R.layout.activity_cue_list)
         setSupportActionBar(findViewById(R.id.toolbar_list))
 
-        if (RemoteDevice.getConnectionStatus()) {
+        if (ModelRemoteInfo.getConnectionStatus()) {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
                 button_online.compoundDrawableTintList = ColorStateList.valueOf(Color.GREEN)
             }
@@ -59,7 +59,7 @@ open class CueListActivity : AppCompatActivity() {
         layoutManager = GridLayoutManager(this, 2)
         recycle_cuelist.layoutManager = layoutManager
 
-        adapter = RecyclerCueAdapter(this)
+        adapter = ModelRecyclerCueAdapter(this)
         recycle_cuelist.adapter = adapter
 
         itemTouchHelper.attachToRecyclerView(recycle_cuelist)
@@ -94,16 +94,16 @@ open class CueListActivity : AppCompatActivity() {
             if(editMode) {
                 button_edit.compoundDrawableTintList = ColorStateList.valueOf(Color.WHITE)
                 editMode = false
-                (adapter as RecyclerCueAdapter).editModeEnable(editMode)
+                (adapter as ModelRecyclerCueAdapter).editModeEnable(editMode)
 
             } else {
                 button_edit.compoundDrawableTintList = ColorStateList.valueOf(Color.RED)
                 editMode = true
-                (adapter as RecyclerCueAdapter).editModeEnable(editMode)
+                (adapter as ModelRecyclerCueAdapter).editModeEnable(editMode)
             }
-            if(CueListMap.getCueCount() > 0) {
-                for (i in 0 until CueListMap.getCueCount()) {
-                    (adapter as RecyclerCueAdapter).notifyItemChanged(i)
+            if(ModelCueListMap.getCueCount() > 0) {
+                for (i in 0 until ModelCueListMap.getCueCount()) {
+                    (adapter as ModelRecyclerCueAdapter).notifyItemChanged(i)
                 }
             }
         }
@@ -126,10 +126,9 @@ open class CueListActivity : AppCompatActivity() {
         button_edit.isEnabled = edit
     }
 
+    //Binds gesture control to the CardViews in the Cue List RecyclerView
     private val itemTouchHelper by lazy {
-        // 1. Note that I am specifying all 4 directions.
-        //    Specifying START and END also allows
-        //    more organic dragging than just specifying UP and DOWN.
+        //UP, DOWN, START and END determine direction of gesture detected
         val simpleItemTouchCallback =
                 object : ItemTouchHelper.SimpleCallback(UP or
                         DOWN or
@@ -140,23 +139,19 @@ open class CueListActivity : AppCompatActivity() {
                                         viewHolder: RecyclerView.ViewHolder,
                                         target: RecyclerView.ViewHolder): Boolean {
 
-                        val adapter = recyclerView.adapter as RecyclerCueAdapter
+                        val adapter = recyclerView.adapter as ModelRecyclerCueAdapter
                         val from = viewHolder.adapterPosition
                         val to = target.adapterPosition
-                        // 2. Update the backing model. Custom implementation in
-                        //    MainRecyclerViewAdapter. You need to implement
-                        //    reordering of the backing model inside the method.
+                        //Updates the RecyclerView Model
                         adapter.moveItem(from, to)
-                        // 3. Tell adapter to render the model update.
+                        //Tell adapter to render the change
                         adapter.notifyItemMoved(from, to)
 
                         return true
                     }
                     override fun onSwiped(viewHolder: RecyclerView.ViewHolder,
                                           direction: Int) {
-                        // 4. Code block for horizontal swipe.
-                        //    ItemTouchHelper handles horizontal swipe as well, but
-                        //    it is not relevant with reordering. Ignoring here.
+                        //Place code here to implement horizontal swipe gesture
                     }
                 }
         ItemTouchHelper(simpleItemTouchCallback)
@@ -167,15 +162,15 @@ open class CueListActivity : AppCompatActivity() {
         if(editMode){
             button_edit.compoundDrawableTintList = ColorStateList.valueOf(Color.WHITE)
             editMode = false
-            (adapter as RecyclerCueAdapter).editModeEnable(editMode)
+            (adapter as ModelRecyclerCueAdapter).editModeEnable(editMode)
         }
         if(blackOut){
             button_blackout.setTextColor(Color.WHITE)
             blackOut = false
             output.endBlackOut()
         }
-        (adapter as RecyclerCueAdapter).resetIndex()
-        val intent = Intent(this, DirectActivity::class.java).apply {}
+        (adapter as ModelRecyclerCueAdapter).resetIndex()
+        val intent = Intent(this, ControllerDirectActivity::class.java).apply {}
         startActivity(intent)
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
     }
@@ -183,18 +178,18 @@ open class CueListActivity : AppCompatActivity() {
 
     fun cuePlay(new: Int, old: Int) {
         if(new != old) {
-            //If no fade required
-            output.goCue(CueListMap.getCue(new))
-            (adapter as RecyclerCueAdapter).notifyItemChanged(new)
+            //If no fade is required
+            output.goCue(ModelCueListMap.getCue(new))
+            (adapter as ModelRecyclerCueAdapter).notifyItemChanged(new)
             if (old >= 0) {
-                (adapter as RecyclerCueAdapter).notifyItemChanged(old)
+                (adapter as ModelRecyclerCueAdapter).notifyItemChanged(old)
             }
         }
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
-        (adapter as RecyclerCueAdapter).notifyDataSetChanged()
+        (adapter as ModelRecyclerCueAdapter).notifyDataSetChanged()
     }
 
 

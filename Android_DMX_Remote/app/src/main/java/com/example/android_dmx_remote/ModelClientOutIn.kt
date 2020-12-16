@@ -1,12 +1,11 @@
 package com.example.android_dmx_remote
 
-import android.R.attr.port
 import android.util.Log
 import java.io.IOException
 import java.net.*
 
 
-class ClientSendListenUDP(ip: String?, port: Int, message: ByteArray) : Runnable {
+class ModelClientOutIn(ip: String?, port: Int, message: ByteArray) : Runnable {
 
     private var ip = ip
     private var port = port
@@ -21,15 +20,15 @@ class ClientSendListenUDP(ip: String?, port: Int, message: ByteArray) : Runnable
             udpSocket.send(packet)
             while (run) {
                 try {
-                    ThreadReturn.message = ""
+                    ModelThreadReturn.message = ""
                     val message = ByteArray(560)
                     val recPacket = DatagramPacket(message, message.size)
                     Log.i("UDP client: ", "about to wait to receive")
                     udpSocket.soTimeout = 2000
                     udpSocket.receive(recPacket)
                     val text = String(message, 0, recPacket.length)
-                    ThreadReturn.message = text
-                    ThreadReturn.available = true
+                    ModelThreadReturn.message = text
+                    ModelThreadReturn.available = true
                     Log.d("Received text", text)
                     //udpSocket.close()
                 } catch (e: IOException) {

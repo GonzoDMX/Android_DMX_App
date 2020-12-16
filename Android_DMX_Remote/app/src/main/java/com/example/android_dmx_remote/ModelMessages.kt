@@ -1,6 +1,6 @@
 package com.example.android_dmx_remote
 
-object Message {
+object ModelMessages {
 
     //Connect to ESP32
     public val connect = "<CONNECT>\r".toByteArray()

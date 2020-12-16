@@ -1,7 +1,7 @@
 package com.example.android_dmx_remote
 
 
-object RegexAPO {
+object ModelCommandRegex {
 
     //Regex check for validating the syntax of the command line input
     fun cmdLineCheck(input: String): Boolean{

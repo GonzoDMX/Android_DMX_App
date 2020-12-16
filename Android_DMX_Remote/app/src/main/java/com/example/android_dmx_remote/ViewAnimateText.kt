@@ -4,7 +4,7 @@ import android.view.animation.CycleInterpolator
 import android.view.animation.TranslateAnimation
 
 //Object for Controlling text and UI animations
-object AnimAPO {
+object ViewAnimateText {
 
     //Text Shake Animation
     fun shakeError(): TranslateAnimation? {

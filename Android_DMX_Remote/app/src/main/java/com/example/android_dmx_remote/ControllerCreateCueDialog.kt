@@ -14,7 +14,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
-class CreateCueDialog
+class ControllerCreateCueDialog
 (var c: Activity, levels: ArrayList<Int>) : Dialog(c), View.OnClickListener {
 
     private val cueLevels = levels
@@ -34,10 +34,10 @@ class CreateCueDialog
                 if(fadeCheck.matches(edit_FadeTime.text.toString())) {
                     val name = edit_CueName.text.toString()
                     val fade = (edit_FadeTime.text.toString().toFloat() * 1000).toInt()
-                    if(CueListMap.nameFree(name)) {
+                    if(ModelCueListMap.nameFree(name)) {
                         Log.d("CHANNEL_CHECK", cueLevels.toString())
-                        var cue = CueClass(name, cueLevels, fade)
-                        CueListMap.addCue(c, cue)
+                        var cue = ModelCueClass(name, cueLevels, fade)
+                        ModelCueListMap.addCue(c, cue)
                         Log.d("CUELIST", "CUE CREATED!")
                         dismiss()
                     } else {
@@ -54,7 +54,7 @@ class CreateCueDialog
     private fun errorCueName() {
         GlobalScope.launch(context = Dispatchers.Main) {
             edit_CueName.setTextColor(Color.RED)
-            edit_CueName.startAnimation(AnimAPO.shakeError())
+            edit_CueName.startAnimation(ViewAnimateText.shakeError())
             delay(250)
             edit_CueName.setTextColor(Color.WHITE)
         }
@@ -63,7 +63,7 @@ class CreateCueDialog
     private fun errorFadeTime() {
         GlobalScope.launch(context = Dispatchers.Main) {
             edit_FadeTime.setTextColor(Color.RED)
-            edit_FadeTime.startAnimation(AnimAPO.shakeError())
+            edit_FadeTime.startAnimation(ViewAnimateText.shakeError())
             delay(250)
             edit_FadeTime.setTextColor(Color.WHITE)
         }

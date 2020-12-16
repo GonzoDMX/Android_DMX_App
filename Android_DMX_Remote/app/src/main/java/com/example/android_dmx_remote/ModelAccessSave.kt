@@ -10,7 +10,7 @@ import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
 
 
-object PrefAccessOr {
+object ModelAccessSave {
 
     private val PREF_FILE = BuildConfig.APPLICATION_ID.replace(".", "_")
     private var sharedPreferences: SharedPreferences? = null
@@ -38,7 +38,7 @@ object PrefAccessOr {
         sharedPreferences = null
     }
 
-    fun saveCueListMap(context: Context, cueMap: MutableMap<Int, CueClass>, cueCount: Int){
+    fun saveCueListMap(context: Context, cueMap: MutableMap<Int, ModelCueClass>, cueCount: Int){
         openPref(context)
         val jsonObject = Gson().toJson(cueMap as Map<Int, Any>)
         //val jsonString = jsonObject.toString()
@@ -57,13 +57,13 @@ object PrefAccessOr {
         if (mapString != "") {
             val count = sharedPreferences!!.getInt(countKey, 0)
             Log.d("COUNT", count.toString())
-            var map: MutableMap<Int, CueClass> = HashMap()
+            var map: MutableMap<Int, ModelCueClass> = HashMap()
             //TODO: Problem here does not properly reconstruct Map Data
 
-            val typeOfHashMap: Type = object : TypeToken<Map<Int, CueClass>?>() {}.type
+            val typeOfHashMap: Type = object : TypeToken<Map<Int, ModelCueClass>?>() {}.type
             map = Gson().fromJson(mapString, typeOfHashMap)
             Log.d("MAPMAP", map.toString())
-            CueListMap.setMap(count, map)
+            ModelCueListMap.setMap(count, map)
         } else {
             Log.d("LOAD", "No Cue List Map Found")
         }

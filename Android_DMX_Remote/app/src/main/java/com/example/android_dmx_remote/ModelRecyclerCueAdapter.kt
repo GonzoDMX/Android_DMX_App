@@ -15,7 +15,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class RecyclerCueAdapter(cueListActivity: CueListActivity) : RecyclerView.Adapter<RecyclerCueAdapter.ViewHolder>() {
+class ModelRecyclerCueAdapter(cueListActivity: ControllerCueListActivity) : RecyclerView.Adapter<ModelRecyclerCueAdapter.ViewHolder>() {
 
     var visible = false
     var oldPlayPosition = -1
@@ -24,7 +24,7 @@ class RecyclerCueAdapter(cueListActivity: CueListActivity) : RecyclerView.Adapte
     private val activity = cueListActivity
 
 
-    inner class ViewHolder(itemView: View, activity: CueListActivity): RecyclerView.ViewHolder(itemView) {
+    inner class ViewHolder(itemView: View, activity: ControllerCueListActivity): RecyclerView.ViewHolder(itemView) {
 
         var cueName: TextView = itemView.findViewById(R.id.text_cuename)
         var fadeTime: TextView = itemView.findViewById(R.id.text_fadetime)
@@ -38,11 +38,11 @@ class RecyclerCueAdapter(cueListActivity: CueListActivity) : RecyclerView.Adapte
                 if(visible){
                     //Trigger Edit Cue Action Here
                     Log.d("CLICK", "Edit Cue: $position")
-                    val editcuedialog = EditCueDialog(activity, position, CueListMap.getCue(position))
+                    val editcuedialog = ControllerEditCueDialog(activity, position, ModelCueListMap.getCue(position))
                     editcuedialog.show()
                 } else {
                     playPosition = position
-                    playTime = CueListMap.getCue(position).fade
+                    playTime = ModelCueListMap.getCue(position).fade
                     activity.cuePlay(position, oldPlayPosition)
                     oldPlayPosition = position
                 }
@@ -64,7 +64,7 @@ class RecyclerCueAdapter(cueListActivity: CueListActivity) : RecyclerView.Adapte
                 }
             }
         }
-        CueListMap.moveCue(activity, from, to)
+        ModelCueListMap.moveCue(activity, from, to)
     }
 
     fun editModeEnable(edit: Boolean) {
@@ -83,8 +83,8 @@ class RecyclerCueAdapter(cueListActivity: CueListActivity) : RecyclerView.Adapte
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.cueName.text = CueListMap.getNames()[position]
-        holder.fadeTime.text = CueListMap.getTimes()[position]
+        holder.cueName.text = ModelCueListMap.getNames()[position]
+        holder.fadeTime.text = ModelCueListMap.getTimes()[position]
 
         if(visible) {
             holder.editImage.visibility = VISIBLE
@@ -119,8 +119,8 @@ class RecyclerCueAdapter(cueListActivity: CueListActivity) : RecyclerView.Adapte
 
 
     override fun getItemCount(): Int {
-        Log.d("RECYCLE", CueListMap.getCueCount().toString())
-        return CueListMap.getCueCount()
+        Log.d("RECYCLE", ModelCueListMap.getCueCount().toString())
+        return ModelCueListMap.getCueCount()
     }
 }
 

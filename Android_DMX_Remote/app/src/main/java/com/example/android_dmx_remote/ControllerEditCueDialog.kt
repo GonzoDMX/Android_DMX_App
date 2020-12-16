@@ -7,8 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.Window
-import com.example.android_dmx_remote.Canaux.levels
-import kotlinx.android.synthetic.main.activity_main.*
+import com.example.android_dmx_remote.ModelChannelArray.levels
 import kotlinx.android.synthetic.main.edit_cue_dialog.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -16,8 +15,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
-class EditCueDialog
-(var c: Activity, pos: Int, cue: CueClass) : Dialog(c), View.OnClickListener {
+class ControllerEditCueDialog
+(var c: Activity, pos: Int, cue: ModelCueClass) : Dialog(c), View.OnClickListener {
 
     private val position = pos
     private val preName: String = cue.name
@@ -43,9 +42,9 @@ class EditCueDialog
                 if(fadeCheck.matches(edit_fade_edit.text.toString())) {
                     val name = edit_name_edit.text.toString()
                     val fade = (edit_fade_edit.text.toString().toFloat() * 1000).toInt()
-                    if(CueListMap.nameEdit(name, position)) {
-                        var cue = CueClass(name, levels, fade)
-                        CueListMap.editCue(c, cue, position)
+                    if(ModelCueListMap.nameEdit(name, position)) {
+                        var cue = ModelCueClass(name, levels, fade)
+                        ModelCueListMap.editCue(c, cue, position)
                         Log.d("CUELIST", "CUE CREATED!")
                         dismiss()
                     } else {
@@ -57,7 +56,7 @@ class EditCueDialog
             }
             R.id.button_delete_edit -> {
                 Log.d("TEST", "Delete: $position")
-                CueListMap.deleteCue(c, position)
+                ModelCueListMap.deleteCue(c, position)
                 dismiss()
             }
             R.id.button_cancel_edit -> dismiss()
@@ -67,7 +66,7 @@ class EditCueDialog
     private fun errorCueName() {
         GlobalScope.launch(context = Dispatchers.Main) {
             edit_name_edit.setTextColor(Color.RED)
-            edit_name_edit.startAnimation(AnimAPO.shakeError())
+            edit_name_edit.startAnimation(ViewAnimateText.shakeError())
             delay(250)
             edit_name_edit.setTextColor(Color.WHITE)
         }
@@ -76,7 +75,7 @@ class EditCueDialog
     private fun errorFadeTime() {
         GlobalScope.launch(context = Dispatchers.Main) {
             edit_fade_edit.setTextColor(Color.RED)
-            edit_fade_edit.startAnimation(AnimAPO.shakeError())
+            edit_fade_edit.startAnimation(ViewAnimateText.shakeError())
             delay(250)
             edit_fade_edit.setTextColor(Color.WHITE)
         }

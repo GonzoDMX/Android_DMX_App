@@ -1,6 +1,6 @@
 package com.example.android_dmx_remote
 
-object ThreadReturn {
+object ModelThreadReturn {
     var message:String = ""
     var available: Boolean = false
 }

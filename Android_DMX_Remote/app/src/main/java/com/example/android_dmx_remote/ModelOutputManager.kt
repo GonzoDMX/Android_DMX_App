@@ -2,10 +2,9 @@ package com.example.android_dmx_remote
 
 import android.util.Log
 import kotlinx.coroutines.*
-import kotlinx.coroutines.NonCancellable.cancel
 import kotlin.coroutines.CoroutineContext
 
-class OutputManager {
+class ModelOutputManager {
 
     private var cueLevels = ArrayList<Int>()
     private var masterLevels = ArrayList<Int>()
@@ -20,7 +19,7 @@ class OutputManager {
         repeat(512) { masterLevels.add(0) }
     }
 
-    fun goCue(cue: CueClass) {
+    fun goCue(cue: ModelCueClass) {
         cueLevels = cue.levels
         var modLevels = ArrayList<Int>()
         for(i in 0 until 512){
@@ -42,7 +41,7 @@ class OutputManager {
                 job!!.cancel()
             }
         }
-        Canaux.levels = cueLevels
+        ModelChannelArray.levels = cueLevels
         if (!blackout) {
             transmit(modLevels)
         }
@@ -63,7 +62,7 @@ class OutputManager {
             val init = ArrayList<Int>()
             //Holds current state values
             var current = ArrayList<Int>()
-            for (level in Canaux.levels) {
+            for (level in ModelChannelArray.levels) {
                 init.add((level * master).toInt())
                 current.add((level * master).toInt())
             }
@@ -81,21 +80,21 @@ class OutputManager {
                             //if fading down
                             if(init[i] > targ[i]) {
                                 val deCount = cueFade - count
-                                current[i] = MathAPO.mapRange(deCount, 0, cueFade, targ[i], init[i])
+                                current[i] = ModelMapRange.mapRange(deCount, 0, cueFade, targ[i], init[i])
                             }
                             //Else fade up
                             else {
-                                current[i] = MathAPO.mapRange(count, 0, cueFade, init[i], targ[i])
+                                current[i] = ModelMapRange.mapRange(count, 0, cueFade, init[i], targ[i])
                             }
                         }
                     }
                     transmit(current)
-                    Canaux.levels = current
+                    ModelChannelArray.levels = current
                     val loopEnd = System.currentTimeMillis()
                     count += (30 + (loopEnd - loopStart).toInt())
                     delay(30)
                 }
-                Canaux.levels = cueLevels
+                ModelChannelArray.levels = cueLevels
                 transmit(targ)
                 job!!.cancel()
             }
@@ -104,11 +103,11 @@ class OutputManager {
     }
 
     private fun transmit(levels: ArrayList<Int>) {
-        if (RemoteDevice.getConnectionStatus()) {
+        if (ModelRemoteInfo.getConnectionStatus()) {
             Thread(
-                    ClientChannelsUDP(
-                            RemoteDevice.getRemoteIP(),
-                            RemoteDevice.getRemotePort(),
+                    ModelChannelOutput(
+                            ModelRemoteInfo.getRemoteIP(),
+                            ModelRemoteInfo.getRemotePort(),
                             levels
                     )
             ).start()
@@ -125,7 +124,7 @@ class OutputManager {
 
     fun endBlackOut() {
         for(i in 0 until 512){
-            masterLevels[i] = ((Canaux.levels[i].toFloat() * master).toInt())
+            masterLevels[i] = ((ModelChannelArray.levels[i].toFloat() * master).toInt())
         }
         transmit(masterLevels)
         blackout = false
@@ -135,7 +134,7 @@ class OutputManager {
     fun setMaster(value: Float){
         this.master = value / 100
         for(i in 0 until 512){
-            masterLevels[i] = ((Canaux.levels[i].toFloat() * master).toInt())
+            masterLevels[i] = ((ModelChannelArray.levels[i].toFloat() * master).toInt())
         }
         if (!blackout) {
             transmit(masterLevels)

@@ -7,7 +7,7 @@ import java.net.InetAddress
 import java.net.UnknownHostException
 import java.nio.ByteOrder
 
-object RemoteConnection {
+object ModelGetRemote {
 
     fun getIPAddress(wifiManager: WifiManager): String? {
 

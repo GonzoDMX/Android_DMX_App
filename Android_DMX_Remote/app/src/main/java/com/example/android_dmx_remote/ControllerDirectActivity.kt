@@ -6,22 +6,18 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.GestureDetector
 import android.view.Gravity
-import android.view.MotionEvent
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.widget.ImageViewCompat.setImageTintList
-import com.example.android_dmx_remote.AnimAPO.shakeError
-import com.example.android_dmx_remote.AnimAPO.slideOut
-import com.example.android_dmx_remote.MathAPO.mapRange
-import com.example.android_dmx_remote.RegexAPO.cmdLineCheck
-import com.example.android_dmx_remote.RegexAPO.splitChannels
+import com.example.android_dmx_remote.ViewAnimateText.shakeError
+import com.example.android_dmx_remote.ViewAnimateText.slideOut
+import com.example.android_dmx_remote.ModelMapRange.mapRange
+import com.example.android_dmx_remote.ModelCommandRegex.cmdLineCheck
+import com.example.android_dmx_remote.ModelCommandRegex.splitChannels
 import kotlinx.android.synthetic.main.activity_direct_remote.*
 import kotlinx.android.synthetic.main.activity_direct_remote.button_online
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -29,9 +25,9 @@ import kotlinx.coroutines.launch
 
 
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-open class DirectActivity : AppCompatActivity() {
+open class ControllerDirectActivity : AppCompatActivity() {
 
-    private val output = OutputManager()
+    private val output = ModelOutputManager()
 
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,7 +38,7 @@ open class DirectActivity : AppCompatActivity() {
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         supportActionBar!!.setDisplayShowHomeEnabled(true)
 
-        if (RemoteDevice.getConnectionStatus()) {
+        if (ModelRemoteInfo.getConnectionStatus()) {
             button_online.compoundDrawableTintList = ColorStateList.valueOf(Color.GREEN)
 
         } else {
@@ -57,7 +53,7 @@ open class DirectActivity : AppCompatActivity() {
 
         button_addcue.setOnClickListener {
             Log.d("CLICK", "Add Cue")
-            val cuedialog = CreateCueDialog(this, Canaux.levels)
+            val cuedialog = ControllerCreateCueDialog(this, ModelChannelArray.levels)
             cuedialog.show()
         }
 
@@ -290,7 +286,7 @@ open class DirectActivity : AppCompatActivity() {
         }
     }
 
-    private fun setChannelValues(cue: CueClass){
+    private fun setChannelValues(cue: ModelCueClass){
         //Non-Blocking Coroutine for updating channel values
         GlobalScope.launch(context = Dispatchers.Main) {
 
@@ -306,7 +302,7 @@ open class DirectActivity : AppCompatActivity() {
                 //Holds current state values
                 val current = ArrayList<Int>()
                 //Disassociate init and current from Canaux
-                for (level in Canaux.levels){
+                for (level in ModelChannelArray.levels){
                     init.add(level)
                     current.add(level)
                 }
@@ -385,7 +381,7 @@ open class DirectActivity : AppCompatActivity() {
 
 
     //Splits cmd line data and Parses out Intensity Value and Fade Time Value
-    private fun parseUserInput(cmdInput: String): CueClass? {
+    private fun parseUserInput(cmdInput: String): ModelCueClass? {
 
         if (cmdInput.contains("@") && cmdInput.takeLast(1) != "@") {
             val mainParser = cmdInput.split("@")
@@ -407,10 +403,10 @@ open class DirectActivity : AppCompatActivity() {
                 if (channels!!.contains(i + 1)) {
                     levelSet.add(intensity!!)
                 } else {
-                    levelSet.add(Canaux.levels[i])
+                    levelSet.add(ModelChannelArray.levels[i])
                 }
             }
-            return CueClass("REMOTE", levelSet, fadetime)
+            return ModelCueClass("REMOTE", levelSet, fadetime)
         }
         else {
             return null
@@ -555,8 +551,8 @@ open class DirectActivity : AppCompatActivity() {
                 val textView = TextView(this)
                 val arrIndex = ((x * 10) + index) -1
                 if (arrIndex < 512) {
-                    textView.text = Canaux.levels[arrIndex].toString()
-                    if (Canaux.levels[arrIndex] > 0) {
+                    textView.text = ModelChannelArray.levels[arrIndex].toString()
+                    if (ModelChannelArray.levels[arrIndex] > 0) {
                         textView.setTextColor(ContextCompat.getColor(textView.context, R.color.android_green))
                     }
                     else {

@@ -6,7 +6,7 @@
     android:layout_height="fill_parent"
     android:background="@drawable/gradient_list"
     android:id="@+id/main_layout"
-    tools:context=".MainActivity"
+    tools:context=".ControllerMainActivity"
     android:animateLayoutChanges="true" >
 
     <androidx.appcompat.widget.Toolbar

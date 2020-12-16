@@ -2,7 +2,7 @@ package com.example.android_dmx_remote
 
 import android.location.Address
 
-object RemoteDevice {
+object ModelRemoteInfo {
     private var ipAddress = "192.168.4.1"
     private var port = 4210
     private var status = false

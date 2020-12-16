@@ -2,29 +2,29 @@ package com.example.android_dmx_remote
 
 import android.content.Context
 import android.util.Log
-import com.example.android_dmx_remote.PrefAccessOr.saveCueListMap
+import com.example.android_dmx_remote.ModelAccessSave.saveCueListMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-object CueListMap {
+object ModelCueListMap {
 
-    private var cues =  mutableMapOf<Int, CueClass>()
+    private var cues =  mutableMapOf<Int, ModelCueClass>()
 
     private var cueCount = 0
 
-    fun setMap(count: Int, map: MutableMap<Int, CueClass>) {
+    fun setMap(count: Int, map: MutableMap<Int, ModelCueClass>) {
         cueCount = count
         cues = map
     }
 
-    fun addCue(context: Context, cue: CueClass) {
+    fun addCue(context: Context, cue: ModelCueClass) {
         cues[cueCount] = cue
         cueCount += 1
         saveCueMap(context, cues, cueCount)
     }
 
-    fun editCue(context: Context, cue: CueClass, pos: Int) {
+    fun editCue(context: Context, cue: ModelCueClass, pos: Int) {
         cues[pos]!!.name = cue.name
         cues[pos]!!.fade = cue.fade
         saveCueMap(context, cues, cueCount)
@@ -58,7 +58,7 @@ object CueListMap {
             keyArray.sort()
             Log.d("KEYS", keyArray.toString())
             //Copy cue map
-            val tempMap = mutableMapOf<Int, CueClass>()
+            val tempMap = mutableMapOf<Int, ModelCueClass>()
             var bump = 0
             for (i in 0 until cueCount) {
                 if (i == to) {
@@ -74,7 +74,7 @@ object CueListMap {
     }
 
 
-    fun getCue(cue: Int): CueClass {
+    fun getCue(cue: Int): ModelCueClass {
         return this.cues[cue]!!
     }
 
@@ -121,7 +121,7 @@ object CueListMap {
         return true
     }
 
-    private fun saveCueMap(context: Context, saveCues: MutableMap<Int, CueClass>, saveCount: Int){
+    private fun saveCueMap(context: Context, saveCues: MutableMap<Int, ModelCueClass>, saveCount: Int){
         GlobalScope.launch(context = Dispatchers.Main) {
             saveCueListMap(context, saveCues, saveCount)
         }

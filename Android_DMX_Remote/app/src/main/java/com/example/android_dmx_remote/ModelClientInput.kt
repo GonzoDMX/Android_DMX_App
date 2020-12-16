@@ -5,7 +5,7 @@ import java.io.IOException
 import java.net.DatagramPacket
 import java.net.DatagramSocket
 
-class ClientListenUDP() : Runnable {
+class ModelClientInput() : Runnable {
 
     private var port = 9001
 
@@ -20,14 +20,14 @@ class ClientListenUDP() : Runnable {
                 Log.i("UDP client: ", "about to wait to receive")
                 udpSocket.receive(packet)
                 val text = String(message, 0, packet.length)
-                ThreadReturn.message = text
-                ThreadReturn.available = true
+                ModelThreadReturn.message = text
+                ModelThreadReturn.available = true
                 if (text == "</WAKE_UP>") {
                     Log.d("WAKE", "Wake Confirmed")
                     udpSocket.receive(packet)
                     val channels = packet.data
                     for (i in 0 until packet.length) {
-                        Canaux.levels[i] = channels[i].toUByte().toInt()
+                        ModelChannelArray.levels[i] = channels[i].toUByte().toInt()
                     }
                 }
                 Log.d("Received data", text)

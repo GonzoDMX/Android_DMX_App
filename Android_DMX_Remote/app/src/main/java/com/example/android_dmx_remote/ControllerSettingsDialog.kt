@@ -3,8 +3,6 @@ package com.example.android_dmx_remote
 import kotlinx.android.synthetic.main.settings_dialog.*
 import android.app.Activity
 import android.app.Dialog
-import android.content.res.Configuration
-import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -12,10 +10,9 @@ import android.view.Window
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatDelegate
-import kotlinx.android.synthetic.main.activity_direct_remote.*
 
 
-class SettingsDialog
+class ControllerSettingsDialog
 (var c: Activity) : Dialog(c), View.OnClickListener, AdapterView.OnItemSelectedListener {
 
     private val spinner_list = arrayOf("SYSTEM DEFAULT", "LIGHT THEME", "DARK THEME")
@@ -34,7 +31,7 @@ class SettingsDialog
         spinner_theme!!.adapter = sadapter
 
         //Set current theme state
-        when(ListenerDaemon.theme) {
+        when(ModelSystemValues.theme) {
             "SYSTEM DEFAULT" ->{ spinner_theme.setSelection(0) }
             "LIGHT THEME" -> { spinner_theme.setSelection(1) }
             "DARK THEME" -> { spinner_theme.setSelection(2) }
@@ -47,8 +44,8 @@ class SettingsDialog
     override fun onClick(v: View) {
         when (v.id) {
             R.id.button_set -> {
-                PrefAccessOr.setValue(context, "Theme", select_theme)
-                ListenerDaemon.theme = select_theme
+                ModelAccessSave.setValue(context, "Theme", select_theme)
+                ModelSystemValues.theme = select_theme
                 when(select_theme){
                     "SYSTEM DEFAULT" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
                     "LIGHT THEME" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)

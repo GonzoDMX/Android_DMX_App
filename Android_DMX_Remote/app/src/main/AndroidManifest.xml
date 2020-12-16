@@ -6,20 +6,20 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <application
-        android:name=".DMXRemoteApp"
+        android:name=".ModelRecallUserData"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="DMX Remote"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Android_DMX_Remote" >
-        <activity android:name=".MainActivity">
+        <activity android:name=".ControllerMainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DirectActivity"/>
-        <activity android:name=".CueListActivity"/>
+        <activity android:name=".ControllerDirectActivity"/>
+        <activity android:name=".ControllerCueListActivity"/>
     </application>
 </manifest>

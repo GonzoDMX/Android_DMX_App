@@ -1,6 +1,6 @@
 package com.example.android_dmx_remote
 
-object Canaux {
+object ModelChannelArray {
     var levels = ArrayList<Int>()
 
     init {
