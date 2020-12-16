@@ -3,6 +3,8 @@ An Android-based DMX Lighting Controller
 
 Created by: Andrew O'Shei
 
+Minimum Android Version Supported: Marshmallow 6.0 (API 23)
+
 ![](Images/APO_ANDROID_image1.jpg)
 
 ![](Images/APO_ANDROID_image2.jpg)
